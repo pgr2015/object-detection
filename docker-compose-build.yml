@@ -172,6 +172,6 @@ services:
             - https_proxy
             - no_proxy
             - IMAGE_TAG
-    image: youtube-pipeline:${IMAGE_TAG}
+    image: youtubebb-pipeline:${IMAGE_TAG}
     depends_on:
         - bonseyes-base
