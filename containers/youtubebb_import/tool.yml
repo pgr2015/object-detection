@@ -1,0 +1,12 @@
+entry_point: "bonseyes_training_base.import_container:create_import_app"
+description: "Import data from Object Detection tar file"
+data_function: "youtubebb_import:get_data"
+parameters:
+  images_url:
+    label: "Images tar URL"
+    type: "string"
+  labels_url:
+    label: "Labels tar URL"
+    type: "string"  
+
+

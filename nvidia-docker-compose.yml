@@ -1,0 +1,160 @@
+services:
+  benchmarking:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: mnist-benchmarking:${IMAGE_TAG}
+    volumes:
+    - benchmarking:/data
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  dashboard:
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    environment:
+    - PIPELINES=youtubebb_pipeline:pipeline
+    image: bonseyes-dashboard:${IMAGE_TAG}
+    volumes:
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  export:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: mnist-export:${IMAGE_TAG}
+    volumes:
+    - export:/data
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  gateway:
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: bonseyes-gateway:${IMAGE_TAG}
+    ports:
+    - 8000:80
+    volumes:
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  import:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: mnist-import:${IMAGE_TAG}
+    volumes:
+    - import:/data
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  pipeline:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: mnist-pipeline:${IMAGE_TAG}
+    volumes:
+    - pipeline:/data
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  train_validation_split:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: mnist-train-validation-split:${IMAGE_TAG}
+    volumes:
+    - train_validation_split:/data
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  training:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: mnist-training:${IMAGE_TAG}
+    volumes:
+    - training:/data
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  visualization:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    environment:
+    - PIPELINE=pipeline
+    image: bonseyes-visualization:${IMAGE_TAG}
+    volumes:
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  youtubebb_export:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: youtubebb-export:${IMAGE_TAG}
+    volumes:
+    - youtubebb_export:/data
+    - datasets_import:/datasetfiles
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  youtubebb_import:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: youtubebb-import:${IMAGE_TAG}
+    volumes:
+    - youtubebb_import:/data
+    - datasets_import:/datasetfiles
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  youtubebb_pipeline:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: youtubebb-pipeline:${IMAGE_TAG}
+    volumes:
+    - youtubebb_pipeline:/data
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+  youtubebb_train_validation_split:
+    depends_on:
+    - dashboard
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    image: youtubebb-train-validation-split:${IMAGE_TAG}
+    volumes:
+    - youtubebb_train_validation_split:/data
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
+version: '3'
+volumes:
+  benchmarking: null
+  datasets_import: null
+  export: null
+  import: null
+  nvidia_driver_384.111:
+    external: true
+  pipeline: null
+  train_validation_split: null
+  training: null
+  youtubebb_export: null
+  youtubebb_import: null
+  youtubebb_pipeline: null
+  youtubebb_train_validation_split: null

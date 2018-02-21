@@ -1,0 +1,9 @@
+entry_point: "bonseyes_containers.tool_api:create_app"
+create_function: "mnist_training:perform_training"
+description: "Trains a MLP model"
+parameters:
+  training-set:
+    type: "artifact"
+    label: "Training Set"
+    artifact-type: com.bonseyes.example.mnist.training-set
+output_type: com.bonseyes.example.mnist.model

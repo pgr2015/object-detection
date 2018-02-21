@@ -1,0 +1,5 @@
+entry_point: "bonseyes_training_base.train_validation_split_container:create_train_validation_split_app"
+description: "Split training data in a 80% training and 20% validation set"
+split_indexes_fun: "mnist_train_validation_split:split_indexes"
+input_type: com.bonseyes.example.mnist.tensor
+output_type: com.bonseyes.example.mnist.training-set

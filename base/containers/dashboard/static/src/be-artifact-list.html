@@ -1,0 +1,294 @@
+<!--
+
+ NVISO CONFIDENTIAL
+
+ Copyright (c) 2017 nViso SA. All Rights Reserved.
+
+ The source code contained or described herein and all documents related to
+ the source code ("Material") is the confidential and proprietary information
+ owned by nViso or its suppliers or licensors.  Title to the  Material remains
+ with nViso SA or its suppliers and licensors. The Material contains trade
+ secrets and proprietary and confidential information of nViso or its
+ suppliers and licensors. The Material is protected by worldwide copyright and trade
+ secret laws and treaty provisions. You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the license
+ agreement you entered into with nViso.
+
+ NVISO MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF
+ THE SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+ TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ PARTICULAR PURPOSE, OR NON-INFRINGEMENT. NVISO SHALL NOT BE LIABLE FOR
+ ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR
+ DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES.
+
+-->
+
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/polymer/lib/utils/flattened-nodes-observer.html">
+
+<link rel="import" href="be-inline-output.html">
+<link rel="import" href="be-expand-button.html">
+<link rel="import" href="be-artifact-create.html">
+
+<dom-module id="be-artifact-list">
+  <template>
+
+    <style>
+
+      .tools {
+        padding-bottom: 10px;
+        text-align: right;
+      }
+
+      .main {
+        background-color: white;
+        border: 1px solid #ddd;
+        padding: 10px;
+      }
+
+      .error-message {
+        color: red;
+        font-weight: bold;
+        padding: 16px;
+      }
+
+      a paper-icon-button {
+        color: black;
+      }
+
+      .output-type {
+        font-size: 70%;
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .details {
+        padding: 16px;
+        overflow: scroll;
+      }
+
+    </style>
+
+    <div class="main">
+
+      <div id="errorMessage" class="error-message"></div>
+
+      <div hidden$="[[!createVisible]]">
+
+        <be-artifact-create id="createForm"
+                            pipeline="[[pipeline]]"
+                            query="[[query]]"
+                            on-be-artifact-create-success="_onCreateSuccess"
+                            on-be-artifact-create-error="_onCreateFailed"
+                            on-be-artifact-create-cancel="hideCreate">
+        </be-artifact-create>
+
+      </div>
+
+      <div class="tools">
+        <template is="dom-if" if="[[!createVisible]]">
+          <paper-icon-button icon="add" on-click="showCreate"></paper-icon-button>
+        </template>
+        <paper-icon-button icon="refresh" on-click="reloadData"></paper-icon-button>
+      </div>
+
+      <iron-ajax
+          id="artifactsRequest"
+          url="/containers/[[pipeline]]/artifacts[[query]]"
+          handle-as="json"
+          last-response="{{artifacts}}">
+      </iron-ajax>
+
+      <vaadin-grid items='[[artifacts]]'>
+
+        <template class="row-details">
+             <div class="details">
+               <be-inline-output label="Parameters" format="json" url="/containers/[[item.container]][[item.href]]/input_parameters" auto>
+               </be-inline-output>
+               <be-inline-output label="Last logs" url="/containers/[[item.container]][[item.href]]/log">
+               </be-inline-output>
+             </div>
+        </template>
+
+        <vaadin-grid-column  flex-grow="1">
+          <template class="header">Name</template>
+          <template><div><be-expand-button expanded="{{expanded}}"></be-expand-button>[[item.name]]</div></template>
+        </vaadin-grid-column>
+
+        <vaadin-grid-column>
+          <template class="header">Type</template>
+          <template><span class="output-type" style$="background-color: [[bgColorFromType(item.output_type)]]; color: [[fgColorFromType(item.output_type)]];">[[item.output_type]]</span></template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+          <template class="header">Container</template>
+          <template>[[item.container]]</template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+          <template class="header">Status</template>
+          <template>[[item.status]]</template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+          <template>
+            <div style="display: flex;">
+              <template is="dom-if" if="[[item.status]] == completed">
+                <a href$="/containers/[[item.container]][[item.href]]/data"><paper-icon-button icon="file-download"></paper-icon-button></a>
+              </template>
+              <a href$="/containers/[[item.container]][[item.href]]/log"><paper-icon-button icon="description"></paper-icon-button></a>
+              <paper-icon-button icon="delete" on-click="deleteItem"></paper-icon-button>
+            </div>
+          </template>
+        </vaadin-grid-column>
+      </vaadin-grid>
+
+    </div>
+  </template>
+
+  <script>
+
+    class BeArtifactList extends Polymer.Element {
+      static get is() { return 'be-artifact-list'; }
+
+      static get properties() {
+				return {
+					pipeline: {
+ 						 type: String,
+ 						 observer: '_pipelineChanged'
+ 				 	},
+          query: {
+ 						 type: String
+ 				 	},
+          createVisible: {
+             type: Boolean,
+             value: false
+          }
+		    }
+		  }
+
+      connectedCallback() {
+        super.connectedCallback();
+
+        //this.timer = setTimeout(e => this.doRefresh(), 10000);
+
+      }
+
+      _pipelineChanged() {
+
+          if (this.pipeline) {
+              this.$.artifactsRequest.generateRequest();
+          }
+
+      }
+
+      doRefresh() {
+
+        this.reloadData();
+
+        this.timer = setTimeout(e => this.doRefresh(), 10000);
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+
+        cancelTimeout(this.timer);
+      }
+
+      deleteItem(e) {
+
+        var request = document.createElement('iron-ajax');
+
+        request.addEventListener('response', e =>  this._deleteSuccess(e));
+        request.addEventListener('error', e =>  this._deleteError(e));
+
+        request.method = 'DELETE';
+        request.url = '/containers/' + e.model.item.container + e.model.item.href + '/';
+        request.headers = {"cache-control": "max-age=0"};
+
+        request.generateRequest();
+
+      }
+
+      bgColorFromType(type) {
+
+        if (type == null || type.length == 0) {
+          return "#000000";
+        }
+
+        // compute a hash of the type string
+        var hash = 0;
+        for (var i = 0; i < type.length; i++) {
+          hash  = ((hash << 5) - hash) + type.charCodeAt(i);
+          hash |= 0;
+        }
+
+        // format the hash as a color code
+        var color = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+        color = "00000".substring(0, 6 - color.length) + color
+
+        return "#" + color;
+
+      }
+
+      fgColorFromType(type) {
+
+        var bgColor = this.bgColorFromType(type)
+
+        var rgb = parseInt(bgColor.substring(1), 16);
+        var r = (rgb >> 16) & 0xff;
+        var g = (rgb >>  8) & 0xff;
+        var b = (rgb >>  0) & 0xff;
+        var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+        if (luma < 120) { // luma per ITU-R BT.709
+          return "#FFFFFF";
+        } else {
+          return "#000000";
+        }
+
+      }
+
+      _deleteError(event) {
+        this.$.errorMessage.innerHTML = "Error while deleting";
+      }
+
+      _deleteSuccess(event) {
+        this.$.errorMessage.innerHTML = "";
+        this.$.artifactsRequest.generateRequest();
+      }
+
+      reloadData() {
+
+        if (this.pipeline) {
+            this.$.artifactsRequest.generateRequest();
+        }
+
+      }
+
+      _onCreateFailed() {
+        this.$.errorMessage.innerHTML = this.$.createForm.errorMessage;
+      }
+
+      _onCreateSuccess() {
+        this.$.errorMessage.innerHTML = "";
+        this.hideCreate();
+        this.reloadData();
+      }
+
+      hideCreate() {
+        this.createVisible = false;
+      }
+
+      showCreate() {
+        this.createVisible = true;
+        this.$.createForm.refresh();
+      }
+
+    }
+
+    customElements.define(BeArtifactList.is, BeArtifactList);
+
+  </script>
+</dom-module>

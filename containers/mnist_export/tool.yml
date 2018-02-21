@@ -1,0 +1,7 @@
+entry_point: "bonseyes_training_base.export_container:create_export_app"
+description: "Exports the MNIST data to a tensor for training"
+filtering_function: "mnist_export:filter_samples"
+processing_function: "mnist_export:export"
+output_type: com.bonseyes.example.mnist.tensor
+input_shape: [1, 28, 28]
+output_shape: [1]
