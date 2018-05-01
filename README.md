@@ -2,7 +2,7 @@
 ###How to clone repository
 
 ```
-git clone git@bitbucket.org:bonseyes/wp3-project-objectdetection.git develop --recursive
+git clone git@bitbucket.org:bonseyes/wp3-project-objectdetection.git --recursive
 ```
 ###Configuration
 
