@@ -1,7 +1,0 @@
-entry_point: "bonseyes_training_base.export_container:create_export_app"
-description: "Extracts label info files from frames"
-filtering_function: "youtubebb_export:filter_samples"
-processing_function: "youtubebb_export:export"
-output_type: com.bonseyes.example.youtubebb.tensor
-input_shape: [3, 416, 416] # numero de canales que tienes ademas de las dimensiones de las imagenes en el resize
-output_shape: [5] # para indicar si la salida tiene tamano 1 solo la clase o varios como los BB
