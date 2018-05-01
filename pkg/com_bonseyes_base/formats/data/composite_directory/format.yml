@@ -1,0 +1,24 @@
+name: com.bonsyes.data.composite-directory.0.1
+
+title: A composition of multiple formats stored in a directory
+
+description: |
+  This format allows to compose multiple formats in a single format. The
+  format allows to create a directory structure and store in the files or
+  directories data formatted by another format.
+
+extends: com.bonsyes.format.directory.0.1
+
+on_disk_representation: |
+  The on-disk representation is a directory, each subdirectory or file can
+  be mapped to a format. In that case the content of the directory must be
+  formatted according to the on_disk_representation of the specified format.
+
+http_api:
+  - endpoint: /
+    description: |
+      Returns a tar containing the on-disk representation of the data
+  - endpoint: /<subpath>/...
+    description: |
+      Follows the HTTP api specified by the format of the data composed
+      under subpath.

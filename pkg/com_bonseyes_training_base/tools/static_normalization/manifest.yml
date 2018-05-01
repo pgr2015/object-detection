@@ -1,0 +1,22 @@
+description: "Create static normalization parameters"
+
+execution:
+  type: docker-image
+  image: com.bonseyes.training.base.static-normalization
+
+output_type: com.bonseyes.normalization-params
+
+actions:
+  create:
+    width:
+      label: "Width"
+      type: string
+    height:
+      label: "Height"
+      type: string
+    mean:
+      label: "Mean"
+      type: string
+    std:
+      label: "Std"
+      type: string

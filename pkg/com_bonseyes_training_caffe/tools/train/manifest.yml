@@ -1,0 +1,22 @@
+description: "Preform training using caffe"
+
+execution:
+  type: docker-image
+  image: com.bonseyes.training.caffe.train
+
+output_type: com.bonseyes.caffe-model
+
+actions:
+  create:
+    model_architecture:
+      label: "Model architecture"
+      type: "resource"
+    test_dataset:
+      label: "test dataset"
+      type: "resource"
+    dataset:
+      label: "Data tensor"
+      type: "resource"
+    solver_config:
+      label: "Solver configuration"
+      type: "resource"

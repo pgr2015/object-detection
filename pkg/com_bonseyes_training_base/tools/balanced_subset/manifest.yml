@@ -1,0 +1,22 @@
+description: Mark a balanced subset of a dataset_processing
+
+execution:
+  type: docker-image
+  image: ch.nviso.training.base.balanced-subset
+
+output_type: com.bonseyes.dataset_processing
+
+actions:
+  create:
+    dataset:
+      label: "Original dataset_processing with annotations"
+      type: string
+    annotation:
+      label: "Name of the annotation to use for balancing"
+      type: string
+    subset_name:
+      label: "Annotation name used to mark samples in the subset"
+      type: string
+    size:
+      label: "Size of the set as a fraction of the original set"
+      type: string

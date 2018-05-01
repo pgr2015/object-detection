@@ -1,0 +1,14 @@
+{% extends "!layout.html" %}
+{% block footer %}
+
+    {% if sourcename %}
+
+    <div style="position: fixed; font-family: sans-serif; font-size: 10pt; bottom: 10px; right: 10px; background-color: #AA1111; border: 1px solid #888888; padding: 10px; ">
+        <a style="color: white"
+           href="https://bitbucket.org/bonseyes/wp3-com.bonseyes.base/src/master/docs/{{ pagename }}.rst">
+            Edit or Comment...
+        </a>
+    </div>
+    {% endif %}
+    {{ super() }}
+{% endblock %}

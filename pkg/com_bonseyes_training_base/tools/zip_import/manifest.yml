@@ -1,0 +1,17 @@
+description: "Import all TIFF, JPEG and PNG images from a ZIP"
+
+help: |
+  This container is used to import a zip containing one or multiple images,
+  without any format or label.
+
+execution:
+  type: docker-image
+  image: com.bonseyes.training.base.zip-import
+
+output_type: com.bonseyes.dataset_processing
+
+actions:
+  create:
+    archive:
+      label: "Archive"
+      type: resource

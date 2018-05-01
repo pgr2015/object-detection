@@ -1,0 +1,13 @@
+description: "Import a dataset_processing from a ZIP"
+
+execution:
+  type: docker-image
+  image: com.bonseyes.training.base.dataset_processing-import
+
+output_type: com.bonseyes.dataset_processing
+
+actions:
+  create:
+    archive:
+      label: "Archive"
+      type: resource

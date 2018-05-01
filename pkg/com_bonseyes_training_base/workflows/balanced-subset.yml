@@ -1,0 +1,48 @@
+description: Create a 10% balanced subset of a dataset_processing
+
+workers:
+
+  balanced_subset:
+    manifest: ./pkg/com.bonseyes.training.base/tools/balanced_subset/manifest.yml
+
+  import:
+    execution:
+      type: workflow-parameter
+      name: dataset_execution
+    worker:
+      type: workflow-parameter
+      name: dataset_worker
+
+parameters:
+
+  dataset_execution:
+    type: resource
+    label: "Dataset Execution"
+
+  dataset_artifact:
+    type: string
+    label: "Dataset Artifact"
+
+  dataset_worker:
+    type: string
+    label: "Dataset Worker"
+
+steps:
+
+  - description: Build balanced subset
+    worker: balanced_subset
+    artifact: subset
+    parameters:
+      dataset:
+        type: artifact
+        worker: tensor
+        name:
+          type: workflow-parameter
+          name: dataset_artifact
+      parameters:
+        type: artifact
+        name: normalization_parameters
+        worker: normalization_parameters
+
+  - description: Wait
+    wait:

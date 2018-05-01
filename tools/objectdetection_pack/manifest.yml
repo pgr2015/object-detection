@@ -1,0 +1,20 @@
+description: "Exports the YoutubeBB data to a tensor for training"
+
+output:
+  data_format: com.bonseyes.data.data-tensors.0.1
+
+image:
+  image_type: dockerfile
+  name: com.bonseyes.reference.objectdetection.pack
+  dockerfile:
+    - ./tools/objectdetection_pack/Dockerfile-base
+    - ./pkg/com_bonseyes_base/images/base/Dockerfile
+    - ./tools/objectdetection_pack/Dockerfile
+
+actions:
+  create:
+    parameters:
+      raw_dataset:
+        type: resource
+        label: "Dataset in lmbd"
+        data_format: com.bonseyes.data.dataset.0.1

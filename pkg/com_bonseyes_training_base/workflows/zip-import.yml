@@ -1,0 +1,22 @@
+description: Import data zip
+
+workers:
+
+  import:
+    manifest: ./pkg/com.bonseyes.training.base/tools/zip_import/manifest.yml
+
+parameters:
+
+  archive:
+    type: resource
+    label: "Archive"
+
+steps:
+
+  - description: Import data zip
+    worker: import
+    artifact: dataset_processing
+    parameters:
+      archive:
+        type: workflow-parameter
+        name: archive

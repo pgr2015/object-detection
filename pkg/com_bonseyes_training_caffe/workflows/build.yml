@@ -1,0 +1,20 @@
+description: Build all containers
+
+workers:
+
+  build_container:
+    type: external
+    address:
+      type: environment
+      name: docker-builder
+    output_type: com.bonseyes.docker-image
+
+steps:
+
+  - description: Build caffe training tool
+    worker: build_container
+    artifact: com.bonseyes.training.caffe.train
+    parameters:
+      context:
+        type: workflow-context
+      docker_file: ./pkg/com.bonseyes.training.caffe/tools/train/Dockerfile

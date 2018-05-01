@@ -1,0 +1,22 @@
+description: "Import data from Object Detection tar file"
+
+image:
+  image_type: dockerfile
+  name: com.bonseyes.reference.objectdetection.import
+  dockerfile:
+    - ./tools/objectdetection_import/Dockerfile-base
+    - ./pkg/com_bonseyes_base/images/base/Dockerfile
+    - ./tools/objectdetection_import/Dockerfile
+
+output:
+  data_format: com.bonseyes.data.dataset.0.1
+
+actions:
+  create:
+    parameters:
+      images:
+        label: "Images"
+        type: string
+      labels:
+        label: "Labels"
+        type: string

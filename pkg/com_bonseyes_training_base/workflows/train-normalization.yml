@@ -1,0 +1,45 @@
+description: Create a unnormalized tensor
+
+workers:
+
+  train_normalization:
+    manifest: ./pkg/com.bonseyes.training.base/tools/train_normalization/manifest.yml
+
+  tensor:
+    execution:
+      type: workflow-parameter
+      name: execution
+    worker:
+      type: workflow-parameter
+      name: worker
+
+
+parameters:
+
+  execution:
+    type: resource
+    label: "Execution"
+
+  artifact:
+    type: string
+    label: "Artifact"
+
+  worker:
+    type: string
+    label: "Worker"
+
+steps:
+
+  - description: Create normalization parameters
+    worker: train_normalization
+    artifact: normalization_parameters
+    parameters:
+      tensor:
+        type: artifact
+        worker: tensor
+        name:
+          type: workflow-parameter
+          name: artifact
+
+  - description: Wait
+    wait:

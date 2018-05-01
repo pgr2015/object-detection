@@ -1,0 +1,24 @@
+description: "Pack images"
+
+parameters:
+  raw_dataset:
+    type: resource
+    label: "Raw dataset"
+
+outputs:
+  training_set:
+    label: "Training tensor"
+
+workers:
+
+  pack_worker:
+    manifest: ./tools/objectdetection_pack/manifest.yml
+
+
+steps:
+  - description: "Pack dataset"
+    name: pack_dataset
+    worker: pack_worker
+    output: training_set
+    parameters:
+      raw_dataset: { type: workflow-parameter, name: raw_dataset }

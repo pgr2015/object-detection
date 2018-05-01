@@ -1,0 +1,22 @@
+description: "Train model with SSD + MobileNet"
+
+parameters:
+  training_set:
+    type: resource
+
+outputs:
+  model:
+    label: "Model"
+
+workers:
+  train_worker:
+    manifest: ./tools/objectdetection_train/manifest.yml
+
+steps:
+  - description: "Train a model"
+    name: youtube_model
+    worker: train_worker
+    output: model
+    parameters:
+      training_set: {type: workflow-parameter, name: training_set }
+      epochs: "28000" #Optional. By default, 28000

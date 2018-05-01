@@ -1,0 +1,28 @@
+name: com.bonsyes.metrics.timeseries.0.1
+
+title: Time series
+
+description: |
+
+  This metric is used to publish a time series. The time series consists
+  of samples, each sample has the following properties:
+
+    - sample_index: an 0-based index of the sample
+
+    - time: the time in seconds since the epoch of the sample
+
+    - value: the value measured at the time
+
+extends: com.bonsyes.format.blob.0.1
+
+on_disk_representation: |
+  The on-disk representation of this metric is a single CSV file with
+  one line for each sample. The row number is the index of the sample
+  and the time and value are encoded as two columns.
+
+http_api:
+  - endpoint: /
+    description: |
+      Returns the on-disk representation of the metric as a text/plain file.
+
+

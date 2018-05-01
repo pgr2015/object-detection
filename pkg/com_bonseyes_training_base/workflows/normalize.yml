@@ -1,0 +1,58 @@
+description: Create a normalized data tensor
+
+workers:
+
+  normalize:
+    manifest: ./pkg/com.bonseyes.training.base/tools/normalize/manifest.yml
+
+  tensor:
+    execution:
+      type: workflow-parameter
+      name: data_execution
+    worker:
+      type: workflow-parameter
+      name: data_worker
+
+  normalization_parameters:
+    execution:
+      type: workflow-parameter
+      name: parameters_execution
+    worker: train_normalization
+
+parameters:
+
+  data_execution:
+    type: resource
+    label: "Data Tensor Execution"
+
+  data_artifact:
+    type: string
+    label: "Data Tensor Artifact"
+
+  data_worker:
+    type: string
+    label: "Data Tensor Worker"
+
+  parameters_execution:
+    type: resource
+    label: "Parameters Execution"
+
+steps:
+
+  - description: Normalize tensor
+    worker: normalize
+    artifact: normalized_dataset
+    parameters:
+      tensor:
+        type: artifact
+        worker: tensor
+        name:
+          type: workflow-parameter
+          name: data_artifact
+      parameters:
+        type: artifact
+        name: normalization_parameters
+        worker: normalization_parameters
+
+  - description: Wait
+    wait:

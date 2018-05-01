@@ -1,0 +1,27 @@
+name: com.bonsyes.metrics.dataset-processing.0.1
+
+title: Monitor an action that is operating on a dataset.
+
+description: |
+
+  This metric is used to monitor an action that is operating on a dataset.
+  It provides two informations:
+
+    - Number of samples that have been processed
+    - Number of samples that remain to be processed
+
+extends: com.bonsyes.format.blob.0.1
+
+on_disk_representation: |
+  The on-disk representation consists in a json file containing a mapping
+  with the following two keys:
+
+    - 'processed_samples' : contains the number of samples to process as int
+
+    - 'remaining_samples': contains the number of samples to process as int
+
+http_api:
+  - endpoint: /
+    description: |
+      Returns the JSON representation of the metric
+

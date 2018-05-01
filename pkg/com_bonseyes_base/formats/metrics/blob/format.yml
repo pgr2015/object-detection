@@ -1,0 +1,16 @@
+name: com.bonsyes.metrics.blob.0.1
+
+title: Simple blob metric
+
+description: |
+  This format represents a simple binary blob
+
+extends: com.bonsyes.format.blob.0.1
+
+on_disk_representation: |
+  The on-disk representation is a single file containing the blob data.
+
+http_api:
+  - endpoint: /
+    description: |
+      Returns the binary data of the blob

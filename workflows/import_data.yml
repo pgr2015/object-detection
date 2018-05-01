@@ -1,0 +1,19 @@
+description: "Import dataset"
+
+outputs:
+  raw_dataset:
+    label: "dataset"
+
+workers:
+  import_worker:
+    manifest: ./tools/objectdetection_import/manifest.yml
+
+steps:
+
+  - description: "Imports a dataset"
+    worker: import_worker
+    name: import_data
+    output: raw_dataset
+    parameters:
+      images: http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/testing/imagesyoutubeBB_B.tar.gz
+      labels: http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/youtube_boundingboxes_detection_train.csv

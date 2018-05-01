@@ -1,0 +1,9 @@
+description: "Caffe base image"
+
+image:
+  name: com.bonseyes.caffe
+  image_type: dockerfile
+  dockerfile:
+    - pkg/com_bonseyes_training_caffe/images/base/Dockerfile
+    - pkg/com_bonseyes_base/images/base/Dockerfile
+

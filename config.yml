@@ -1,0 +1,16 @@
+application_config:
+  run_opts:
+#    mem_limit: "2G"
+#    memswap_limit: "2G"
+    devices:
+      - /dev/nvidiactl
+      #- /dev/nvidia-uvm-tools
+      - /dev/nvidia-uvm
+      - /dev/nvidia0
+    volumes:
+      /home/chema/Bonseyes/bonseyes-wp3-project-objectdetection-V4/datos_compartidos:
+        bind: /volumes/data
+        mode: rw
+      nvidia_driver_387.34:
+        bind: /usr/local/nvidia
+        mode: ro

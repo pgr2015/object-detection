@@ -1,0 +1,24 @@
+description: "Trains a Caffe SSD +  MobileNet model"
+
+image:
+  image_type: dockerfile
+  name: com.bonseyes.reference.objectdetection.training-caffe
+  dockerfile:
+    - ./tools/objectdetection_train/Dockerfile-base
+    - ./pkg/com_bonseyes_base/images/base/Dockerfile
+    - ./tools/objectdetection_train/Dockerfile
+
+output:
+  data_format: com.bonseyes.data.blob.0.1
+
+actions:
+  create:
+    parameters:
+      training_set:
+        label: "Training Set"
+        type: resource
+        #data_format: com.bonseyes.data.data-tensors.0.1
+      epochs:
+        label: "Number of epochs"
+        type: string
+        optional: true

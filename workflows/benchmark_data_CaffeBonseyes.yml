@@ -1,0 +1,26 @@
+description: "Benchmark model using CaffeBonseyes"
+
+parameters:
+  model:
+    type: resource
+  training_set:
+    type: resource
+    
+outputs:
+  benchmark_report:
+    label: "Benchmark report"
+
+workers:
+
+  benchmark_worker_CaffeBonseyes:
+    manifest: ./tools/objectdetection_benchmark_CaffeBonseyes/manifest.yml
+
+steps:
+  - description: "Benchmark a model using CaffeBonseyes"
+    name: benchmark_CaffeBonseyes
+    worker: benchmark_worker_CaffeBonseyes
+    output: benchmark_report
+    parameters:
+      model: {type: workflow-parameter, name: model}
+      training_set: {type: workflow-parameter, name: training_set }
+      epochs: "500" #Optional. By default, 20000

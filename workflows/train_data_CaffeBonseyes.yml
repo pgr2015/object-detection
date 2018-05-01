@@ -1,0 +1,25 @@
+description: "Train model with SSD + MobileNet using CaffeBonseyes"
+
+parameters:
+  model:
+    type: resource
+  training_set:
+    type: resource
+
+outputs:
+  model:
+    label: "Model"
+
+workers:
+  train_worker_CaffeBonseyes:
+    manifest: ./tools/objectdetection_train_CaffeBonseyes/manifest.yml
+
+steps:
+  - description: "Train a model with CaffeBonseyes"
+    name: youtube_model_CaffeBonseyes
+    worker: train_worker_CaffeBonseyes
+    output: model
+    parameters:
+      training_set: {type: workflow-parameter, name: training_set }
+      model: {type: workflow-parameter, name: model}
+      epochs: "270"

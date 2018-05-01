@@ -1,0 +1,82 @@
+description: "Pipeline Object Detection"
+
+outputs:
+
+  raw_dataset:
+    label: "dataset"
+
+  training_set:
+    label: "Training tensor"
+    
+  model:
+    label: "Model"
+
+  benchmark_report:
+    label: "Benchmark report"
+
+
+
+workers:
+
+  import_worker:
+    manifest: ./tools/objectdetection_import/manifest.yml
+  pack_worker:
+    manifest: ./tools/objectdetection_pack/manifest.yml
+  train_worker:
+    manifest: ./tools/objectdetection_train/manifest.yml
+  benchmark_worker:
+    manifest: ./tools/objectdetection_benchmark/manifest.yml
+
+
+
+steps:
+
+  - description: "Import a dataset"
+    worker: import_worker
+    name: import_dataT
+    output: raw_dataset
+    parameters:
+      images: http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/imagesyoutubeBB_T.tar.gz
+      labels: http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/youtube_boundingboxes_detection_train.csv
+ 
+      
+  - description: "Pack dataset"
+    name: pack_datasetT
+    worker: pack_worker
+    output: training_set
+    parameters:
+      raw_dataset: { type: artifact, step: import_dataT }    
+      
+  - description: "Import a dataset"
+    worker: import_worker
+    name: import_dataB
+    output: raw_dataset
+    parameters:
+      images: http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/testing/imagesyoutubeBB_B.tar.gz
+      labels: http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/youtube_boundingboxes_detection_train.csv    
+      
+
+  - description: "Pack dataset"
+    name: pack_datasetB
+    worker: pack_worker
+    output: training_set
+    parameters:
+      raw_dataset: { type: artifact, step: import_dataB }     
+ 
+      
+  - description: "Train a model"
+    name: youtube_model
+    worker: train_worker
+    output: model
+    parameters:
+      training_set: {type: artifact, step: pack_datasetT }
+      epochs: "380"     
+
+  - description: "Benchmark a model"
+    name: benchmark
+    worker: benchmark_worker
+    output: benchmark_report
+    parameters:
+      model: {type: artifact, step: youtube_model}
+      training_set: {type: artifact, step: pack_datasetB }
+      epochs: "400"

@@ -1,0 +1,71 @@
+workers:
+
+  import:
+    execution:
+      type: workflow-parameter
+      name: data_execution
+    worker:
+      type: workflow-parameter
+      name: data_worker
+
+  tiling:
+    manifest: ./pkg/ch.nviso.nv3dfi-worker/tools/tiling/manifest.yml
+
+  data_augmentation_quality:
+    manifest: ./pkg/com.bonseyes.training.base/tools/data_augmentation_quality/manifest.yml
+
+  nv3dfi_worker:
+    type: docker-image
+    image: nv3dfi-worker
+    tag: master
+    registry: nexus.vms.pse.nviso.ch:10001
+    environment:
+      NV3DFI_WORKER_COUNT: 50
+
+parameters:
+
+  data_execution:
+    type: resource
+    label: "Data Tensor Execution"
+
+  data_artifact:
+    type: string
+    label: "Data Tensor Artifact"
+
+  data_worker:
+    type: string
+    label: "Data Tensor Worker"
+
+  nv3dfi_options:
+    type: resource
+    label: "Nv3dfi options json file"
+
+steps:
+
+  - description: Run the data augmentation on quality
+    name: augment_dataset_quality
+    worker: data_augmentation_quality
+    artifact: augmented_dataset
+    parameters:
+      datasets:
+        type: artifact
+        worker: import
+        name: { type: workflow-parameter, name: data_artifact }
+      augmentation_size: 36
+      seed: 44
+      export_augmented: True
+      enable_tan_trigg: False
+
+  - description: Run the worker to generate tile images
+    name: tile_data
+    worker: tiling
+    artifact: tiled_data
+    parameters:
+      dataset:
+        - type: artifact
+          step: augment_dataset_quality
+      worker_url: { type: worker-url, name: nv3dfi_worker }
+      options: { type: workflow-parameter, name: nv3dfi_options }
+
+  - description: wait for user
+    wait:
