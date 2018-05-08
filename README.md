@@ -112,19 +112,6 @@ pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data_CaffeBonseyes.ym
 
 In the `workflows/benchmark_data_CaffeBonseyes.yml` file, the user can change the number of ==epochs== (parameter epochs). By default, epochs = 20000
 
-###Pipeline with Caffe SSD + MobileNet
-
-To run a full pipeline with Caffe SSD + MobileNet you can use the following command:
-
-```
-pkg/com_bonseyes_base/bin/be-admin run --name pipeline_v4 --config config.yml --force workflows/pipeline.yml
-```
-
-In the `workflows/pipeline.yml` file the user can establish the following parameters:
-- The image dataset and the labels file (csv) for training
-- The image dataset and the labels file (csv) for benchmarking.
-- Epochs for training with SSD + MobileNet
-- Epochs for benchmark with SSD + MobileNet
 
 ###Pipeline with CaffeBonseyes
 To run a full pipeline with Caffe SSD + MobileNet and CaffeBonseyes you can use the following command:
@@ -133,7 +120,7 @@ To run a full pipeline with Caffe SSD + MobileNet and CaffeBonseyes you can use 
 pkg/com_bonseyes_base/bin/be-admin run --name pipeline_CaffeBonseyes --config config.yml --force workflows/pipeline_CaffeBonseyes.yml
 ```
 
-In the `workflows/pipeline.yml` file the user can establish the following parameters:
+In the `workflows/pipeline_CaffeBonseyes.yml` file the user can establish the following parameters:
 - The image dataset and the labels file (csv) for training
 - The image dataset and the labels file (csv) for benchmarking.
 - Epochs for training with SSD + MobileNet
