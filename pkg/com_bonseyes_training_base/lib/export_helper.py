@@ -38,6 +38,7 @@ from PIL import Image
 import io
 from io import BytesIO
 import time
+import shutil
 
 import numpy
 from multiprocessing import Queue
@@ -174,10 +175,11 @@ def write_tensor(context: Context[DataTensorsEditor],editor: DataTensorsEditor, 
                     f.close()
                     #mapfile=data_root_dir+"/"+dataset_name+"/labelmap_youtubebb.prototxt"
                 #time.sleep(20)
-                download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt", os.path.join(tmp_dir, "labelmap_youtubebb.prototxt"))
-                download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/create_annoset.py", os.path.join(tmp_dir, "create_annoset.py"))
-                download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/convert_annoset", os.path.join(tmp_dir, "convert_annoset"))
-                  
+                download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt", os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"))
+                download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/create_annoset.py", os.path.join("/volumes/data", "create_annoset.py"))
+                download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/convert_annoset", os.path.join("/volumes/data", "convert_annoset"))
+                shutil.copy2(os.path.join("/volumes/data", "create_annoset.py"),os.path.join(tmp_dir, "create_annoset.py"));  
+                shutil.copy2(os.path.join("/volumes/data", "convert_annoset"),os.path.join(tmp_dir, "convert_annoset"));
                 os.chmod(os.path.join(tmp_dir, "convert_annoset"), 0o777)
                 redo = 0
                 root_dir = tmp_dir
@@ -185,7 +187,9 @@ def write_tensor(context: Context[DataTensorsEditor],editor: DataTensorsEditor, 
                 data_root_dir = tmp_dir
                 dataset_name = "youtube-bb"
         
+                shutil.copy2(os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"),os.path.join(tmp_dir, "labelmap_youtubebb.prototxt"));
                 mapfile= os.path.join(data_root_dir, "labelmap_youtubebb.prototxt")
+		
                 testFile = tmp_dir
         
                 anno_type = "detection"
@@ -242,10 +246,10 @@ def download(url, output_file):
         if ret.status_code != 200:
             raise Exception('Unable to file (error code %d)' % ret.status_code)
 
-    with open(output_file, 'wb') as fp:
-        for chunk in ret.iter_content(chunk_size=1024 * 1024):
-            if chunk:
-                fp.write(chunk)
+        with open(output_file, 'wb') as fp:
+            for chunk in ret.iter_content(chunk_size=1024 * 1024):
+                if chunk:
+                    fp.write(chunk)
     
     log.info("Downloaded %d bytes", os.path.getsize(output_file))   
              

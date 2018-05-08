@@ -67,7 +67,7 @@ pkg/com_bonseyes_base/bin/be-admin run --name packTraining --config config.yml -
 ```
 
 
-###Export benchmark
+###Pack benchmark
 
 To pack the imported images in the import for benchmarking step you can use the following command:
 ```

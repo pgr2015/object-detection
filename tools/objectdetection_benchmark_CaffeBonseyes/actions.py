@@ -41,9 +41,11 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
         with zipfile.ZipFile (training_set, 'r') as z:
             z.extractall(tmp_dir)
 
-        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt", os.path.join(tmp_dir, "labelmap_youtubebb.prototxt"))
-        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/testing/solverGeneratorTesting_CaffeBonseyes.py", os.path.join(tmp_dir, "solverGeneratorTesting_CaffeBonseyes.py"))
+        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt", os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"))
+        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/testing/solverGeneratorTesting_CaffeBonseyes.py", os.path.join("/volumes/data", "solverGeneratorTesting_CaffeBonseyes.py"))
 
+        shutil.copy2(os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"),os.path.join(tmp_dir, "labelmap_youtubebb.prototxt"));
+        shutil.copy2(os.path.join("/volumes/data", "solverGeneratorTesting_CaffeBonseyes.py"),os.path.join(tmp_dir, "solverGeneratorTesting_CaffeBonseyes.py"));
 
 
         shutil.move (os.path.join(tmp_dir, 'youtube-bb_trainval_lmdb'), os.path.join(tmp_dir, 'youtube-bb_test_lmdb'))
@@ -56,7 +58,8 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
 
         labelmap_path = os.path.join(tmp_dir, 'labelmap_youtubebb.prototxt')
 
-        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen.py", os.path.join(tmp_dir, "gen.py"))
+        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen.py", os.path.join("/volumes/data", "gen.py"))
+        shutil.copy2(os.path.join("/volumes/data", "gen.py"),os.path.join(tmp_dir, "gen.py"));
 
         # ================Train.prototxt================
         cmd = ['python', os.path.join(tmp_dir, "gen.py"), "-s", "train", "-d", lmdb_path_tra, "-l", labelmap_path, "-c", "24", "-b", "8"]
@@ -90,8 +93,7 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
 
         #================Solver.prototxt================
         num_iter_tra = "0"
-
-        cmd = ['python', os.path.join(tmp_dir, "solverGeneratorTesting_CaffeBonseyes.py"), "-ntr", train_path, "-nte", test_path,  "-it", epochs, "-itt", num_iter_test, "-o", tmp_dir+ "/"]
+        cmd = ['python', os.path.join(tmp_dir, "solverGeneratorTesting_CaffeBonseyes.py"), "-ntr", train_path, "-nte", test_path,  "-it", num_iter_tra, "-itt", epochs, "-o", tmp_dir + "/"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         process.wait()
 
@@ -105,7 +107,6 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
 
 
         #================End Solver.prototxt================
-
         log.info("Start benchmark")
         weights_path = os.path.join (tmp_dir, "trained-model.caffemodel")
         full_command = ['/opt/caffe/build/tools/caffe', 'train', '--solver=' + solver_path, '--weights='+ weights_path, '--gpu', '0'];
@@ -176,10 +177,8 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
                      ('mAP ',AP[24])]
                  ),fp)
 
-def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str="20000"):#tensor: DataTensorsViewer, model: BlobDataViewer, pairs: str):
+def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str="5000"):#tensor: DataTensorsViewer, model: BlobDataViewer, pairs: str):
 
-    log.info ('hola')
     log.info (context)
     
-
     perform_bebenchmarking(context, model, training_set, epochs)

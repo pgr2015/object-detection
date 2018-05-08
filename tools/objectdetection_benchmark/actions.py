@@ -41,10 +41,11 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
         with zipfile.ZipFile (training_set, 'r') as z:
             z.extractall(tmp_dir)
 
-        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt", os.path.join(tmp_dir, "labelmap_youtubebb.prototxt"))
-        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/testing/solverGeneratorTesting.py", os.path.join(tmp_dir, "solverGeneratorTesting.py"))
+        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt", os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"))
+        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/testing/solverGeneratorTesting.py", os.path.join("/volumes/data", "solverGeneratorTesting.py"))
 
-
+        shutil.copy2(os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"),os.path.join(tmp_dir, "labelmap_youtubebb.prototxt"));
+        shutil.copy2(os.path.join("/volumes/data", "solverGeneratorTesting.py"),os.path.join(tmp_dir, "solverGeneratorTesting.py"));
 
         shutil.move (os.path.join(tmp_dir, 'youtube-bb_trainval_lmdb'), os.path.join(tmp_dir, 'youtube-bb_test_lmdb'))
 
@@ -56,7 +57,8 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
 
         labelmap_path = os.path.join(tmp_dir, 'labelmap_youtubebb.prototxt')
 
-        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen.py", os.path.join(tmp_dir, "gen.py"))
+        download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen.py", os.path.join("/volumes/data", "gen.py"))
+        shutil.copy2(os.path.join("/volumes/data", "gen.py"),os.path.join(tmp_dir, "gen.py"));
 
         # ================Train.prototxt================
         cmd = ['python', os.path.join(tmp_dir, "gen.py"), "-s", "train", "-d", lmdb_path_tra, "-l", labelmap_path, "-c", "24", "-b", "24"]
@@ -173,9 +175,8 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
                     ('mAP ',AP[24])]
                 ),fp)    
 
-def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str="20000"):#tensor: DataTensorsViewer, model: BlobDataViewer, pairs: str):
+def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str="5000"):#tensor: DataTensorsViewer, model: BlobDataViewer, pairs: str):
 
-    log.info ('hola')
     log.info (context)
     
 

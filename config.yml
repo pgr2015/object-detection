@@ -8,9 +8,9 @@ application_config:
       - /dev/nvidia-uvm
       - /dev/nvidia0
     volumes:
-      /home/chema/Bonseyes/bonseyes-wp3-project-objectdetection-V4/datos_compartidos:
+      /media/mila/DATOS/BONSEYES/pipeline_Bonseyes/Final/datos_compartidos:
         bind: /volumes/data
         mode: rw
-      nvidia_driver_387.34:
+      nvidia_driver_384.111:
         bind: /usr/local/nvidia
         mode: ro

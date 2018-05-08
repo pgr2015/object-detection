@@ -10,6 +10,7 @@ import tarfile
 import csv
 import time
 import zipfile
+import shutil
 
 import requests
 from PIL import Image
@@ -47,10 +48,15 @@ def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataT
 		with zipfile.ZipFile(training_set, 'r') as z:
 			z.extractall(tmp_dir)
 
-		download('http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt', os.path.join (tmp_dir, "labelmap_youtubebb.prototxt"))
-		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/MobileNetSSD_deploy.caffemodel", os.path.join (tmp_dir ,"MobileNetSSD_deploy.caffemodel"))
-		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen.py", os.path.join(tmp_dir, "gen.py"))
-		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/solverGenerator.py", os.path.join(tmp_dir, "solverGenerator.py"))
+		download('http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt', os.path.join ("/volumes/data", "labelmap_youtubebb.prototxt"))
+		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/MobileNetSSD_deploy.caffemodel", os.path.join ("/volumes/data" ,"MobileNetSSD_deploy.caffemodel"))
+		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen.py", os.path.join("/volumes/data", "gen.py"))
+		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/solverGenerator.py", os.path.join("/volumes/data", "solverGenerator.py"))
+		
+		shutil.copy2(os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"),os.path.join(tmp_dir, "labelmap_youtubebb.prototxt"));
+		shutil.copy2(os.path.join("/volumes/data", "MobileNetSSD_deploy.caffemodel"),os.path.join(tmp_dir, "MobileNetSSD_deploy.caffemodel"));
+		shutil.copy2(os.path.join("/volumes/data", "gen.py"),os.path.join(tmp_dir, "gen.py"));
+		shutil.copy2(os.path.join("/volumes/data", "solverGenerator.py"),os.path.join(tmp_dir, "solverGenerator.py"));
 
 		labelmap_path = os.path.join(tmp_dir, "labelmap_youtubebb.prototxt")
 		lmdb_path = os.path.join(tmp_dir, "youtube-bb_trainval_lmdb")
@@ -65,6 +71,7 @@ def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataT
 		process.wait()
 		train_path = os.path.join(tmp_dir, "MobileNetSSD_train.prototxt")
 		proto = open(train_path, 'wb')
+		
 		output, errors = process.communicate()
 		log.info(errors)
 
@@ -72,6 +79,7 @@ def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataT
 
 		proto.flush()
 		proto.close()
+		#shutil.copy2(os.path.join(tmp_dir, "MobileNetSSD_train.prototxt"),os.path.join("/volumes/data", "MobileNetSSD_train.prototxt"));
 		#================Train.prototxt================
 
         #================Solver.prototxt================
@@ -118,7 +126,6 @@ def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataT
 
 def create(context: Context[BlobDataEditor], training_set: DataTensorsViewer, epochs: str="28000"):#BlobDataEditor
 
-	print ('hola ')
 	print (epochs)
 	log.info (training_set)
 	lmdb_path =  '/'+training_set.split('/')[1]+'/'+training_set.split('/')[2]+'/data'

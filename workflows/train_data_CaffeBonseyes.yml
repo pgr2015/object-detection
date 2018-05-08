@@ -22,4 +22,4 @@ steps:
     parameters:
       training_set: {type: workflow-parameter, name: training_set }
       model: {type: workflow-parameter, name: model}
-      epochs: "270"
+      epochs: "28000"

@@ -41,7 +41,6 @@ def download(url, output_file):
 
 
 def get_data(images: str, labels:str, context: Context[DataSetEditor]):
-	log.info ("hola")
 
 	images_path = os.path.join ("/volumes/data", images.split('/')[-1])
 	labels_path = os.path.join ("/volumes/data", labels.split('/')[-1])

@@ -10,6 +10,7 @@ import zipfile
 import requests
 import subprocess
 import logging as log
+import shutil
 
 from com_bonseyes_base.formats.data.blob.api import BlobDataEditor
 from com_bonseyes_base.formats.data.data_tensors.api import DataTensorsViewer, DimensionNames
@@ -44,10 +45,14 @@ def perform_training_caffe(context: Context[BlobDataEditor], model: BlobDataEdit
 			with zipfile.ZipFile(model_zip, 'r') as z:
 				z.extractall(tmp_dir)
 
-		download('http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt', os.path.join (tmp_dir, "labelmap_youtubebb.prototxt"))
-		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen.py", os.path.join(tmp_dir, "gen.py"))
-		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/solverGenerator_CaffeBonseyes.py", os.path.join(tmp_dir, "solverGenerator_CaffeBonseyes.py"))
+		download('http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt', os.path.join ("/volumes/data", "labelmap_youtubebb.prototxt"))
+		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen.py", os.path.join("/volumes/data", "gen.py"))
+		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/solverGenerator_CaffeBonseyes.py", os.path.join("/volumes/data", "solverGenerator_CaffeBonseyes.py"))
 
+		shutil.copy2(os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"),os.path.join(tmp_dir, "labelmap_youtubebb.prototxt"));
+		shutil.copy2(os.path.join("/volumes/data", "gen.py"),os.path.join(tmp_dir, "gen.py"));
+		shutil.copy2(os.path.join("/volumes/data", "solverGenerator_CaffeBonseyes.py"),os.path.join(tmp_dir, "solverGenerator_CaffeBonseyes.py"));
+		
 		labelmap_path = os.path.join(tmp_dir, "labelmap_youtubebb.prototxt")
 		lmdb_path = os.path.join(tmp_dir, "youtube-bb_trainval_lmdb")
 

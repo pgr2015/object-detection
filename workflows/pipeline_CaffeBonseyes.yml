@@ -24,6 +24,8 @@ workers:
     manifest: ./tools/objectdetection_pack/manifest.yml
   train_worker:
     manifest: ./tools/objectdetection_train/manifest.yml
+  benchmark_worker:
+    manifest: ./tools/objectdetection_benchmark/manifest.yml  
   train_worker_CaffeBonseyes:
     manifest: ./tools/objectdetection_train_CaffeBonseyes/manifest.yml
   benchmark_worker_CaffeBonseyes:
@@ -72,7 +74,16 @@ steps:
     output: model
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
-      epochs: "200"
+      epochs: "28000"
+      
+  - description: "Benchmark a model"
+    name: benchmark
+    worker: benchmark_worker
+    output: benchmark_report
+    parameters:
+      model: {type: artifact, step: youtube_model}
+      training_set: {type: artifact, step: pack_datasetB }
+      epochs: "5000"    
 
   - description: "Train a model with caffeBonseyes"
     name: youtube_model_CaffeBonseyes
@@ -81,7 +92,7 @@ steps:
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
       model: {type: artifact, step: youtube_model}
-      epochs: "210"
+      epochs: "28000"
 
   - description: "Benchmark a model"
     name: benchmark_CaffeBonseyes
@@ -90,4 +101,4 @@ steps:
     parameters:
       model: {type: artifact, step: youtube_model_CaffeBonseyes}
       training_set: {type: artifact, step: pack_datasetB }
-      epochs: "100"
+      epochs: "5000"
