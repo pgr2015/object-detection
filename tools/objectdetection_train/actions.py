@@ -40,7 +40,7 @@ def download(url, output_file):
 					fp.write(chunk)
 
 
-def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataTensorsViewer, epochs: str):
+def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataTensorsViewer, epochs: str, batch: str):
 
 	#with context.data.edit_content() as output_path:
 	with tempfile.TemporaryDirectory() as tmp_dir:
@@ -65,7 +65,7 @@ def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataT
 		#os.chmod(os.path.join (lmdb_path, "lock.mdb"), 0o777)
 		
 		#================Train.prototxt================
-		cmd = ['python', os.path.join(tmp_dir, "gen.py"), "-s", "train", "-d", lmdb_path, "-l", labelmap_path, "-c", "24", "-b", "26"]
+		cmd = ['python', os.path.join(tmp_dir, "gen.py"), "-s", "train", "-d", lmdb_path, "-l", labelmap_path, "-c", "24", "-b", batch]
 
 		process = subprocess.Popen(cmd, bufsize=1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		process.wait()
@@ -124,11 +124,11 @@ def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataT
 
 
 
-def create(context: Context[BlobDataEditor], training_set: DataTensorsViewer, epochs: str="28000"):#BlobDataEditor
+def create(context: Context[BlobDataEditor], training_set: DataTensorsViewer, epochs: str="28000", batch ="24"):#BlobDataEditor
 
 	print (epochs)
 	log.info (training_set)
 	lmdb_path =  '/'+training_set.split('/')[1]+'/'+training_set.split('/')[2]+'/data'
 	log.info(lmdb_path)
 		
-	perform_training_caffe (context, training_set, epochs)
+	perform_training_caffe (context, training_set, epochs, batch)

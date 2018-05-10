@@ -82,7 +82,7 @@ To train a model with SSD + MobileNet you can use the following command:
 pkg/com_bonseyes_base/bin/be-admin run workflows/train_data.yml --name training_v4 --force --config config.yml --param training_set execution-output local: packTraining training_set
 ```
 
-In the `workflows/train_data.yml` file the user can establish the number of `epochs` (parameter epochs). By default, epochs = 28000
+In the `workflows/train_data.yml` file the user can establish the number of `epochs` (parameter epochs) and batch size `batch`. By default, epochs = 28000 and batch = 24
 
 ###Training CaffeBonseyes
 
@@ -92,7 +92,7 @@ To train a model with CaffeBonseyes you can use the following command:
 pkg/com_bonseyes_base/bin/be-admin run workflows/train_data_CaffeBonseyes.yml --name training_CaffeBonseyes --force --config config.yml --param model execution-output local: training_v4 model --param training_set execution-output local: packTraining training_set
 ```
 
-In the `workflows/train_data_CaffeBonseyes.yml` file the user can change the number of `epochs` (parameter epochs). By default, epochs = 28000.
+In the `workflows/train_data_CaffeBonseyes.yml` file the user can establish the number of `epochs` (parameter epochs) and batch size `batch`. By default, epochs = 28000 and batch = 24
 
 
 ###Benchmark
@@ -101,7 +101,7 @@ To benchmark a model with Caffe you can use the following command:
 ```
 pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data.yml --name benchmark_v4 --config config.yml --force --param model execution-output local: training_v4 model --param training_set execution-output local: packBenchmark training_set
 ```
-In the `workflows/benchmark_data.yml` file, the user can change the number of `epochs` (parameter epochs). By default, epochs = 20000
+In the `workflows/benchmark_data.yml` file the user can establish the number of `epochs` (parameter epochs) and batch size `batch`. By default, epochs = 5000 and batch = 24
 
 ###Benchmark CaffeBonseyes
 To benchmark a model with CaffeBonseyes you can use the following command:
@@ -110,7 +110,7 @@ To benchmark a model with CaffeBonseyes you can use the following command:
 pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data_CaffeBonseyes.yml --name benchmark_CaffeBonseyes --config config.yml --force --param model execution-output local: training_CaffeBonseyes model --param training_set execution-output local: packBenchmark training_set
 ```
 
-In the `workflows/benchmark_data_CaffeBonseyes.yml` file, the user can change the number of ==epochs== (parameter epochs). By default, epochs = 20000
+In the `workflows/benchmark_data_CaffeBonseyes.yml` file the user can establish the number of `epochs` (parameter epochs) and batch size `batch`. By default, epochs = 5000 and batch = 24
 
 
 ###Pipeline with CaffeBonseyes

@@ -34,6 +34,7 @@ actions:
         label: "Number of epochs for benchmarking"
         type: string
         optional: true
-      # pairs:
-      #   label: "Pairs File"
-      #   type: resource
+      batch:
+        label: "Batch size"
+        type: string
+        optional: true 

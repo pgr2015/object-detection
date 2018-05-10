@@ -29,7 +29,7 @@ def download(url, output_file):
                     fp.write(chunk)
 
 
-def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str):
+def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str, batch: str):
 
     with tempfile.TemporaryDirectory() as tmp_dir:
 
@@ -61,7 +61,7 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
         shutil.copy2(os.path.join("/volumes/data", "gen.py"),os.path.join(tmp_dir, "gen.py"));
 
         # ================Train.prototxt================
-        cmd = ['python', os.path.join(tmp_dir, "gen.py"), "-s", "train", "-d", lmdb_path_tra, "-l", labelmap_path, "-c", "24", "-b", "24"]
+        cmd = ['python', os.path.join(tmp_dir, "gen.py"), "-s", "train", "-d", lmdb_path_tra, "-l", labelmap_path, "-c", "24", "-b", batch]
 
         process = subprocess.Popen(cmd, bufsize=1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.wait()
@@ -76,7 +76,7 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
         proto.close()
         
         #================Test.prototxt================
-        cmd = ['python', os.path.join(tmp_dir, "gen.py"), "-s", "test", "-d", lmdb_path_test, "-l", labelmap_path, "-c", "24", "-b", "24"]
+        cmd = ['python', os.path.join(tmp_dir, "gen.py"), "-s", "test", "-d", lmdb_path_test, "-l", labelmap_path, "-c", "24", "-b", batch]
 
         process = subprocess.Popen(cmd, bufsize=1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.wait()
@@ -175,9 +175,9 @@ def perform_bebenchmarking (context: Context[BlobDataEditor], model: BlobDataEdi
                     ('mAP ',AP[24])]
                 ),fp)    
 
-def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str="5000"):#tensor: DataTensorsViewer, model: BlobDataViewer, pairs: str):
+def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str="5000", batch: str="24"):#tensor: DataTensorsViewer, model: BlobDataViewer, pairs: str):
 
     log.info (context)
     
 
-    perform_bebenchmarking(context, model, training_set, epochs)
+    perform_bebenchmarking(context, model, training_set, epochs, batch)

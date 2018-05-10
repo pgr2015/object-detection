@@ -27,3 +27,7 @@ actions:
         label: "Number of epochs"
         type: string
         optional: true
+      batch:
+        label: "Batch size"
+        type: string
+        optional: true  

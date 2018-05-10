@@ -33,7 +33,7 @@ def download(url, output_file):
 					fp.write(chunk)
 
 
-def perform_training_caffe(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str):
+def perform_training_caffe(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str, batch: str):
 
 	#with context.data.edit_content() as output_path:
 	with tempfile.TemporaryDirectory() as tmp_dir:
@@ -46,18 +46,18 @@ def perform_training_caffe(context: Context[BlobDataEditor], model: BlobDataEdit
 				z.extractall(tmp_dir)
 
 		download('http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt', os.path.join ("/volumes/data", "labelmap_youtubebb.prototxt"))
-		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen.py", os.path.join("/volumes/data", "gen.py"))
+		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/gen_CaffeBonseyes.py", os.path.join("/volumes/data", "gen_CaffeBonseyes.py"))
 		download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/solverGenerator_CaffeBonseyes.py", os.path.join("/volumes/data", "solverGenerator_CaffeBonseyes.py"))
 
 		shutil.copy2(os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"),os.path.join(tmp_dir, "labelmap_youtubebb.prototxt"));
-		shutil.copy2(os.path.join("/volumes/data", "gen.py"),os.path.join(tmp_dir, "gen.py"));
+		shutil.copy2(os.path.join("/volumes/data", "gen_CaffeBonseyes.py"),os.path.join(tmp_dir, "gen_CaffeBonseyes.py"));
 		shutil.copy2(os.path.join("/volumes/data", "solverGenerator_CaffeBonseyes.py"),os.path.join(tmp_dir, "solverGenerator_CaffeBonseyes.py"));
 		
 		labelmap_path = os.path.join(tmp_dir, "labelmap_youtubebb.prototxt")
 		lmdb_path = os.path.join(tmp_dir, "youtube-bb_trainval_lmdb")
 
 		#================Train.prototxt================
-		cmd = ['python', os.path.join(tmp_dir, "gen.py"), "-s", "train", "-d", lmdb_path, "-l", labelmap_path, "-c", "24", "-b", "5"]
+		cmd = ['python', os.path.join(tmp_dir, "gen_CaffeBonseyes.py"), "-s", "train", "-d", lmdb_path, "-l", labelmap_path, "-c", "24", "-b", batch]
 
 		process = subprocess.Popen(cmd, bufsize=1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		process.wait()
@@ -110,7 +110,7 @@ def perform_training_caffe(context: Context[BlobDataEditor], model: BlobDataEdit
 
 
 
-def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str="28000"):#BlobDataEditor
+def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, epochs: str="28000", batch="24"):#BlobDataEditor
 
 	print ('hola ')
 	print (epochs)
@@ -118,4 +118,4 @@ def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set
 	lmdb_path =  '/'+training_set.split('/')[1]+'/'+training_set.split('/')[2]+'/data'
 	log.info(lmdb_path)
 
-	perform_training_caffe (context, model, training_set, epochs)
+	perform_training_caffe (context, model, training_set, epochs, batch)
