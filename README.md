@@ -41,6 +41,13 @@ The exact name of the `nvidia_driver` volume can be found with the following com
 docker volumes ls | grep nvidia
 ```
 
+### Data needed ###
+Training images	imagesyoutubeBB_T.tar.gz
+Test images		imagesyoutubeBB_B.tar.gz
+label_map			youtube_boundingboxes_detection_train.csv
+labels			labelmap_youtubebb.prototxt
+
+
 ###How to run the import for training
 
 To import the youtube dataset for training you can use the following command:
@@ -56,8 +63,6 @@ To import the youtube dataset for benchmarking you can use the following command
 pkg/com_bonseyes_base/bin/be-admin run --name import_data_benchmark --config config.yml --force workflows/import_data.yml \
 --param images url volume://data/imagesyoutubeBB_B.tar.gz --param labels url volume://data/youtube_boundingboxes_detection_train.csv
 ```
-
-In the `workflows/import_data.yml` file the user can establish the url where the dataset is uploaded (parameter `images` for image dataset and parameter labels for csv).
 
 ###Pack Training
 
