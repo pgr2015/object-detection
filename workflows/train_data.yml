@@ -19,5 +19,5 @@ steps:
     output: model
     parameters:
       training_set: {type: workflow-parameter, name: training_set }
-      epochs: "28000" #Optional. By default, 28000
-      batch: "24" #Optional. By default, 24
+      epochs: "120000" #Optional. By default, 28000
+      batch_size: "24" #Optional. By default, 24

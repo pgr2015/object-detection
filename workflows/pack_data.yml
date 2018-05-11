@@ -1,6 +1,7 @@
 description: "Pack images"
 
 parameters:
+
   raw_dataset:
     type: resource
     label: "Raw dataset"

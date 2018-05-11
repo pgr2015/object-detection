@@ -34,7 +34,7 @@ actions:
         label: "Number of epochs for benchmarking"
         type: string
         optional: true
-      batch:
+      batch_size:
         label: "Batch size"
         type: string
-        optional: true  
+        optional: true
