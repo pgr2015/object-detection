@@ -1,2 +1,4 @@
-be
-venv
+be/
+venv/
+.idea/
+
