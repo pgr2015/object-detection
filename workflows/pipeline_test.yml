@@ -93,8 +93,8 @@ steps:
     output: model
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
-      epochs: "12000"
-      batch_size: "24" #Optional. By default, 24
+      epochs: "10" #"28000"
+      batch_size: "5" #Optional. By default, 28000
       
   - description: "Benchmark a model"
     name: benchmark
@@ -103,8 +103,8 @@ steps:
     parameters:
       model: {type: artifact, step: youtube_model}
       training_set: {type: artifact, step: pack_datasetB }
-      epochs: "5000"
-      batch_size: "6" #Optional. By default, 6
+      epochs: "10" #"5000"
+      batch_size: "5" #Optional. By default, 28000
 
   - description: "Train a model with caffeBonseyes"
     name: youtube_model_CaffeBonseyes
@@ -113,8 +113,8 @@ steps:
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
       model: {type: artifact, step: youtube_model}
-      epochs: "12000"
-      batch_size: "12" #Optional. By default, 12
+      epochs: "10" #"28000"
+      batch_size: "5" #Optional. By default, 28000
 
   - description: "Benchmark a model"
     name: benchmark_CaffeBonseyes
@@ -123,5 +123,5 @@ steps:
     parameters:
       model: {type: artifact, step: youtube_model_CaffeBonseyes}
       training_set: {type: artifact, step: pack_datasetB }
-      epochs: "5000"
-      batch_size: "6" #Optional. By default, 6
+      epochs: "10" #"5000"
+      batch_size: "5" #Optional. By default, 28000

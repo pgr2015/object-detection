@@ -4,13 +4,13 @@ application_config:
 #    memswap_limit: "2G"
     devices:
       - /dev/nvidiactl
-      #- /dev/nvidia-uvm-tools
+      - /dev/nvidia-uvm-tools
       - /dev/nvidia-uvm
       - /dev/nvidia0
     volumes:
-      /media/mila/DATOS/BONSEYES/pipeline_Bonseyes/Final/datos_compartidos:
+      /home/noelia/Descargas/data/files-objectdetection/:
         bind: /volumes/data
-        mode: rw
+        mode: ro
       nvidia_driver_384.111:
         bind: /usr/local/nvidia
         mode: ro

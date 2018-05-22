@@ -174,13 +174,7 @@ def write_tensor(context: Context[DataTensorsEditor],editor: DataTensorsEditor, 
                     #link_file.close()
                     f.close()
                     #mapfile=data_root_dir+"/"+dataset_name+"/labelmap_youtubebb.prototxt"
-                #time.sleep(20)
-                download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/labelmap_youtubebb.prototxt", os.path.join("/volumes/data", "labelmap_youtubebb.prototxt"))
-                download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/create_annoset.py", os.path.join("/volumes/data", "create_annoset.py"))
-                download("http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/convert_annoset", os.path.join("/volumes/data", "convert_annoset"))
-                shutil.copy2(os.path.join("/volumes/data", "create_annoset.py"),os.path.join(tmp_dir, "create_annoset.py"));  
-                shutil.copy2(os.path.join("/volumes/data", "convert_annoset"),os.path.join(tmp_dir, "convert_annoset"));
-                os.chmod(os.path.join(tmp_dir, "convert_annoset"), 0o777)
+
                 redo = 0
                 root_dir = tmp_dir
                 #root_dir = input_artifact
@@ -205,13 +199,13 @@ def write_tensor(context: Context[DataTensorsEditor],editor: DataTensorsEditor, 
         
                 log.info(extra_cmd)
                 test_trainval = ["test", "trainval"]
-        
+
                 element = "trainval"
                 elementxt = "datatest.txt"
 
                 log.info (output_file)
         
-                cmd = ['python3', root_dir+"/"+"create_annoset.py", "--anno-type="+anno_type, "--label-map-file="+mapfile, "--min-dim="+str(min_dim), "--max-dim="+str(max_dim), "--resize-width="+str(width), "--resize-height="+str(height),"--check-label", extra_cmd, '--encoded', '--redo', data_root_dir, os.path.join(testFile, element+".txt"), os.path.join(output_file[:-5], dataset_name+"_"+element+"_"+db), "examples/"+dataset_name]
+                cmd = ['python3', "/opt/caffe/scripts"+"/"+"create_annoset.py", "--anno-type="+anno_type, "--label-map-file="+mapfile, "--min-dim="+str(min_dim), "--max-dim="+str(max_dim), "--resize-width="+str(width), "--resize-height="+str(height),"--check-label", extra_cmd, '--encoded', '--redo', data_root_dir, os.path.join(testFile, element+".txt"), os.path.join(output_file[:-5], dataset_name+"_"+element+"_"+db), os.path.join(tmp_dir,dataset_name)]
                 log.info(cmd)
     
                 process = subprocess.Popen(cmd, bufsize=1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -232,26 +226,7 @@ def write_tensor(context: Context[DataTensorsEditor],editor: DataTensorsEditor, 
                     z.write(path2, arcname=dataset_name+"_"+element+"_"+db+'/lock.mdb')
 
 
-            
-            
-            
-def download(url, output_file):
-
-    if os.path.exists(output_file):
-        log.info('Output file already exists')
-
-    else:
-        ret = requests.get(url, stream=True)
-
-        if ret.status_code != 200:
-            raise Exception('Unable to file (error code %d)' % ret.status_code)
-
-        with open(output_file, 'wb') as fp:
-            for chunk in ret.iter_content(chunk_size=1024 * 1024):
-                if chunk:
-                    fp.write(chunk)
-    
-    log.info("Downloaded %d bytes", os.path.getsize(output_file))   
+             
              
 
 def write_classification_tensor(context: Context[DataTensorsEditor],dataset_viewers: Union[DataSetViewer, List[DataSetViewer]],
@@ -288,3 +263,5 @@ def write_classification_tensor(context: Context[DataTensorsEditor],dataset_view
                                       bound_processing_fun, bound_write_fun)
 
     logging.info("Tensor written")
+
+

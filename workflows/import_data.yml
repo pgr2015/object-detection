@@ -1,5 +1,16 @@
 description: "Import dataset"
 
+parameters:
+
+  images:
+    label: "Training images"
+    type: resource
+
+  labels:
+    label: "Training labels"
+    type: resource
+
+
 outputs:
   raw_dataset:
     label: "dataset"
@@ -15,5 +26,5 @@ steps:
     name: import_data
     output: raw_dataset
     parameters:
-      images: http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/imagesyoutubeBB_T.tar.gz
-      labels: http://161.67.219.121/BONSEYES_Reference_Datasets/YoutubeBB/training/youtube_boundingboxes_detection_train.csv
+      images: { type: workflow-parameter, name: images }
+      labels: { type: workflow-parameter, name: labels }

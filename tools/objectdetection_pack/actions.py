@@ -28,7 +28,7 @@ import lxml.etree as etree
 import logging as log
 
 
-def _export_face(datum: Datum):
+def _export_image(datum: Datum):
     # create input tensor
     
     
@@ -64,7 +64,7 @@ def create(context: Context[DataTensorsEditor], raw_dataset: DataSetViewer):
                                 input_type=DataType.UINT32,
                                 class_names=class_names,
                                 export_data_types=[BONSEYES_PNG_IMAGE_TYPE],
-                                process_sample_fun=_export_face,
+                                process_sample_fun=_export_image,
                                 editor=context.data,
                                 output_dimensions=[(DimensionNames.CLASS_INDEX, 5)],
                                 output_type=DataType.UINT32)

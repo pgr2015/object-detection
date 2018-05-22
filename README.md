@@ -41,29 +41,36 @@ The exact name of the `nvidia_driver` volume can be found with the following com
 docker volumes ls | grep nvidia
 ```
 
+### Data needed ###
+Training images	imagesyoutubeBB_T.tar.gz
+Test images		imagesyoutubeBB_B.tar.gz
+label_map			youtube_boundingboxes_detection_train.csv
+labels			labelmap_youtubebb.prototxt
+
+
 ###How to run the import for training
 
 To import the youtube dataset for training you can use the following command:
 ```
-pkg/com_bonseyes_base/bin/be-admin run --name import_data_training --config config.yml --force workflows/import_data.yml
-```
-In the `workflows/import_data.yml` file the user can establish the url where the dataset is uploaded (parameter `images` for image dataset and parameter labels for csv).
+pkg/com_bonseyes_base/bin/be-admin run --name import_data_train --config config.yml --force workflows/import_data.yml \
+--param images url volume://data/imagesyoutubeBB_T.tar.gz --param labels url volume://data/youtube_boundingboxes_detection_train.csv
 
+```
 ###How to run the import for benchmarking
 
 To import the youtube dataset for benchmarking you can use the following command:
 ```
-pkg/com_bonseyes_base/bin/be-admin run --name import_data_benchmark --config config.yml --force workflows/import_data.yml
+pkg/com_bonseyes_base/bin/be-admin run --name import_data_benchmark --config config.yml --force workflows/import_data.yml \
+--param images url volume://data/imagesyoutubeBB_B.tar.gz --param labels url volume://data/youtube_boundingboxes_detection_train.csv
 ```
-
-In the `workflows/import_data.yml` file the user can establish the url where the dataset is uploaded (parameter `images` for image dataset and parameter labels for csv).
 
 ###Pack Training
 
 To pack the imported images in the import for training step you can use the following command:
 
 ```
-pkg/com_bonseyes_base/bin/be-admin run --name packTraining --config config.yml --force workflows/pack_data.yml --param raw_dataset execution-output local: import_data_training raw_dataset
+pkg/com_bonseyes_base/bin/be-admin run --name packTraining  --config config.yml --force workflows/pack_data.yml \
+--param raw_dataset execution-output local: import_data_train raw_dataset
 ```
 
 
@@ -71,7 +78,8 @@ pkg/com_bonseyes_base/bin/be-admin run --name packTraining --config config.yml -
 
 To pack the imported images in the import for benchmarking step you can use the following command:
 ```
-pkg/com_bonseyes_base/bin/be-admin run --name packBenchmark --config config.yml --force workflows/pack_data.yml --param raw_dataset execution-output local: import_data_benchmark raw_dataset
+pkg/com_bonseyes_base/bin/be-admin run --name packBenchmark --config config.yml --force workflows/pack_data.yml \
+--param raw_dataset execution-output local: import_data_benchmark raw_dataset
 ```
 
 
@@ -79,45 +87,53 @@ pkg/com_bonseyes_base/bin/be-admin run --name packBenchmark --config config.yml 
 To train a model with SSD + MobileNet you can use the following command:
 
 ```
-pkg/com_bonseyes_base/bin/be-admin run workflows/train_data.yml --name training_v4 --force --config config.yml --param training_set execution-output local: packTraining training_set
+pkg/com_bonseyes_base/bin/be-admin run workflows/train_data.yml --name training_v4 --force --config config.yml \
+--param training_set execution-output local: packTraining training_set
 ```
 
-In the `workflows/train_data.yml` file the user can establish the number of `epochs` (parameter epochs) and batch size `batch`. By default, epochs = 28000 and batch = 24
+In the `workflows/train_data.yml` file the user can establish the number of `epochs` (parameter epochs). By default, epochs = 28000
 
 ###Training CaffeBonseyes
 
 To train a model with CaffeBonseyes you can use the following command:
 
 ```
-pkg/com_bonseyes_base/bin/be-admin run workflows/train_data_CaffeBonseyes.yml --name training_CaffeBonseyes --force --config config.yml --param model execution-output local: training_v4 model --param training_set execution-output local: packTraining training_set
+pkg/com_bonseyes_base/bin/be-admin run workflows/train_data_CaffeBonseyes.yml --name training_CaffeBonseyes --force --config config.yml \
+--param model execution-output local: training_v4 model --param training_set execution-output local: packTraining training_set
 ```
 
-In the `workflows/train_data_CaffeBonseyes.yml` file the user can establish the number of `epochs` (parameter epochs) and batch size `batch`. By default, epochs = 28000 and batch = 24
+In the `workflows/train_data_CaffeBonseyes.yml` file the user can change the number of `epochs` (parameter epochs). By default, epochs = 28000.
 
 
 ###Benchmark
 To benchmark a model with Caffe you can use the following command:
 
 ```
-pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data.yml --name benchmark_v4 --config config.yml --force --param model execution-output local: training_v4 model --param training_set execution-output local: packBenchmark training_set
+pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data.yml --name benchmark_v4 --config config.yml --force \
+--param model execution-output local: training_v4 model --param training_set execution-output local: packBenchmark training_set
 ```
-In the `workflows/benchmark_data.yml` file the user can establish the number of `epochs` (parameter epochs) and batch size `batch`. By default, epochs = 5000 and batch = 24
+In the `workflows/benchmark_data.yml` file, the user can change the number of `epochs` (parameter epochs). By default, epochs = 20000
 
 ###Benchmark CaffeBonseyes
 To benchmark a model with CaffeBonseyes you can use the following command:
 
 ```
-pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data_CaffeBonseyes.yml --name benchmark_CaffeBonseyes --config config.yml --force --param model execution-output local: training_CaffeBonseyes model --param training_set execution-output local: packBenchmark training_set
+pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data_CaffeBonseyes.yml --name benchmark_CaffeBonseyes --force --config config.yml \
+--param model execution-output local: training_CaffeBonseyes model --param training_set execution-output local: packBenchmark training_set
+
 ```
 
-In the `workflows/benchmark_data_CaffeBonseyes.yml` file the user can establish the number of `epochs` (parameter epochs) and batch size `batch`. By default, epochs = 5000 and batch = 24
+In the `workflows/benchmark_data_CaffeBonseyes.yml` file, the user can change the number of ==epochs== (parameter epochs). By default, epochs = 20000
 
 
 ###Pipeline with CaffeBonseyes
 To run a full pipeline with Caffe SSD + MobileNet and CaffeBonseyes you can use the following command:
 
 ```
-pkg/com_bonseyes_base/bin/be-admin run --name pipeline_CaffeBonseyes --config config.yml --force workflows/pipeline_CaffeBonseyes.yml
+pkg/com_bonseyes_base/bin/be-admin run --name pipeline_CaffeBonseyes --config config.yml --force workflows/pipeline_CaffeBonseyes.yml \
+--param train_images url volume://data/imagesyoutubeBB_T.tar.gz --param train_labels url volume://data/youtube_boundingboxes_detection_train.csv \
+--param test_images url volume://data/imagesyoutubeBB_B.tar.gz --param test_labels url volume://data/youtube_boundingboxes_detection_train.csv
+
 ```
 
 In the `workflows/pipeline_CaffeBonseyes.yml` file the user can establish the following parameters:
