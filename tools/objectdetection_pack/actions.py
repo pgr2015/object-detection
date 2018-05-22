@@ -9,7 +9,7 @@ from com_bonseyes_base.formats.data.database.api import DataType
 from com_bonseyes_base.formats.data.dataset.api import DataSetViewer
 from com_bonseyes_base.lib.api.tool import Context
 from com_bonseyes_training_base.lib import BONSEYES_PNG_IMAGE_TYPE
-from com_bonseyes_training_base.lib.export_helper import write_classification_tensor
+from my_export_helper import write_classification_tensor
 
 from PIL import Image
 from io import BytesIO

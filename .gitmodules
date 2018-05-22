@@ -1,0 +1,12 @@
+[submodule "pkg/com_bonseyes_base"]
+	path = pkg/com_bonseyes_base
+	url = git@bitbucket.org:bonseyes/wp3-com.bonseyes.base.git
+[submodule "pkg/com_bonseyes_training_base"]
+	path = pkg/com_bonseyes_training_base
+	url = git@bitbucket.org:bonseyes/wp3-com.bonseyes.training.base.git
+[submodule "pkg/com_bonseyes_training_caffe"]
+	path = pkg/com_bonseyes_training_caffe
+	url = git@bitbucket.org:bonseyes/wp3-com.bonseyes.training.caffe.git
+[submodule "pkg/com_bonseyes_lpdnn"]
+	path = pkg/com_bonseyes_lpdnn
+	url = git@bitbucket.org:bonseyes/wp3-com.bonseyes.lpdnn.git
