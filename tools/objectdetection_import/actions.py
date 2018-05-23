@@ -10,8 +10,6 @@ from collections import OrderedDict
 
 from PIL import Image
 
-import logging as log
-
 from bonseyes_youtubebb import BONSEYES_OD_ANNOTATION_TYPE
 
 from com_bonseyes_base.formats.data.dataset.api import DataSetEditor
@@ -61,7 +59,6 @@ def get_data(images: str, labels: str, image_type: str):
                     frame_name = 'frame_' + row[0] + '_' + row[2] + '_' + row[4] + '_' + str(second)
 
                     if frame_name in samples_names:
-                        log.info('IN')
 
                         # Get image size
                         with Image.open(tar.extractfile(samples_names[frame_name])) as pil_image:
@@ -75,24 +72,18 @@ def get_data(images: str, labels: str, image_type: str):
 
                         annotations = OrderedDict(
                             [('annotation',
-                              OrderedDict([('folder', '.'), ('filename', frame_name + image_type),
-                                           ('path', frame_name + image_type),
+                              OrderedDict([('folder', '.'), ('filename', frame_name + '_data_' + image_type),
+                                           ('path', frame_name + '_data_' + image_type),
                                            ('source', OrderedDict([('database', 'Bonseyes_OD')])),
                                            ('size', OrderedDict([('width', img_size[0]), ('height', img_size[1]),
                                                                  ('depth', '3')])),
-                                           ('segmented', '0'),
                                            ('object', OrderedDict([('name', object_type),
-                                                                   ('pose', 'Frontal'),
-                                                                   ('truncated', '0'),
-                                                                   ('difficult', '0'),
-                                                                   ('occluded', '0'),
-                                                                   (
-                                                                   'bndbox', OrderedDict([('xmin', bounding_box[0]),
-                                                                                          ('xmax', bounding_box[1]),
-                                                                                          ('ymin', bounding_box[2]),
-                                                                                          ('ymax', bounding_box[
-                                                                                              3])]))]))]))])
-
+                                                                   ('bndbox', OrderedDict(
+                                                                       [('xmin', int(img_size[0] * bounding_box[0])),
+                                                                        ('xmax', int(img_size[0] * bounding_box[1])),
+                                                                        ('ymin', int(img_size[1] * bounding_box[2])),
+                                                                        ('ymax', int(img_size[1] * bounding_box[3]))
+                                                                        ]))]))]))])
 
                         yield str(frame_name), {BONSEYES_PNG_IMAGE_TYPE: img}, {
                             BONSEYES_OD_ANNOTATION_TYPE: annotations}

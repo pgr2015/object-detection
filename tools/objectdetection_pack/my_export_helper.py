@@ -182,7 +182,14 @@ def write_tensor(context: Context[DataTensorsEditor],editor: DataTensorsEditor, 
 
                 log.info (output_file)
         
-                cmd = ['python3', "/opt/caffe/scripts"+"/"+"create_annoset.py", "--anno-type="+anno_type, "--label-map-file="+mapfile, "--min-dim="+str(min_dim), "--max-dim="+str(max_dim), "--resize-width="+str(width), "--resize-height="+str(height),"--check-label", extra_cmd, '--encoded', '--redo', data_root_dir, os.path.join(testFile, element+".txt"), os.path.join(output_file[:-5], dataset_name+"_"+element+"_"+db), os.path.join(tmp_dir,dataset_name)]
+                cmd = ['python3', "/opt/caffe/scripts"+"/"+"create_annoset.py", "--anno-type="+anno_type,
+                       "--label-map-file="+mapfile, "--min-dim="+str(min_dim), "--max-dim="+str(max_dim),
+                       "--resize-width="+str(width), "--resize-height="+str(height),"--check-label", extra_cmd,
+                       '--encoded', '--redo',
+                       data_root_dir,
+                       os.path.join(testFile, element+".txt"),
+                       os.path.join(output_file[:-5], dataset_name+"_"+element+"_"+db),
+                       os.path.join(tmp_dir, dataset_name)]
                 log.info(cmd)
     
                 process = subprocess.Popen(cmd, bufsize=1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

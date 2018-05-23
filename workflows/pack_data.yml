@@ -5,6 +5,9 @@ parameters:
   raw_dataset:
     type: resource
     label: "Raw dataset"
+  label_map:
+    type: resource
+    label: "Labelmap file"
 
 outputs:
   training_set:
@@ -23,3 +26,4 @@ steps:
     output: training_set
     parameters:
       raw_dataset: { type: workflow-parameter, name: raw_dataset }
+      label_map: { type: workflow-parameter, name: label_map }

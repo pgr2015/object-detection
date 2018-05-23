@@ -70,7 +70,8 @@ To pack the imported images in the import for training step you can use the foll
 
 ```
 pkg/com_bonseyes_base/bin/be-admin run --name packTraining  --config config.yml --force workflows/pack_data.yml \
---param raw_dataset execution-output local: import_data_train raw_dataset
+--param raw_dataset execution-output local: import_data_train raw_dataset \
+--param label_map url volume://data/labelmap_youtubebb.prototxt
 ```
 
 
@@ -79,7 +80,8 @@ pkg/com_bonseyes_base/bin/be-admin run --name packTraining  --config config.yml 
 To pack the imported images in the import for benchmarking step you can use the following command:
 ```
 pkg/com_bonseyes_base/bin/be-admin run --name packBenchmark --config config.yml --force workflows/pack_data.yml \
---param raw_dataset execution-output local: import_data_benchmark raw_dataset
+--param raw_dataset execution-output local: import_data_benchmark raw_dataset \
+--param label_map url volume://data/labelmap_youtubebb.prototxt
 ```
 
 
