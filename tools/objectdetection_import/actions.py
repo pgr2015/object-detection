@@ -4,7 +4,6 @@
 # Copyright (c) 2017 UCLM SA. All Rights Reserved.
 #
 import os
-import tempfile
 import tarfile
 import csv
 from collections import OrderedDict
@@ -22,28 +21,27 @@ from com_bonseyes_training_base.lib.import_helper import write_dataset
 
 
 def get_data(images: str, labels: str, image_type: str):
-    samples_names = []
+
+    samples_names = {}
+
     if image_type is BONSEYES_PNG_IMAGE_TYPE:
         file_extension = '.png'
     else:
         file_extension = '.jpeg'
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        with tarfile.open(images, 'r') as tar:
-            for member in tar.getmembers():
+    with tarfile.open(images, 'r') as tar:
+        for member in tar.getmembers():
 
-                file = member.name
-                file = os.path.normpath(file)
+            file = member.name
+            file = os.path.normpath(file)
 
-                if not file.endswith(file_extension):
-                    continue
+            if not file.endswith(file_extension):
+                continue
 
-                sample_id = os.path.basename(file)[:-4]
+            # File name without extension
+            sample_id = os.path.basename(file)[:-4]
 
-                member.name = os.path.join(*(member.name.split(os.path.sep)[1:]))
-
-                samples_names.append(sample_id)
-                tar.extract(member, tmp_dir)
+            samples_names[sample_id] = member
 
         with open(labels, 'r') as csv_file:
 
@@ -58,47 +56,46 @@ def get_data(images: str, labels: str, image_type: str):
                     second = 0
 
                 if row[5] == 'present':
-                    frame_path = os.path.join(tmp_dir)
-                    frame_path = os.path.join(frame_path, 'frame_' + row[0] + '_' + row[2] + '_' + row[4] + '_' + str(
-                        second) + file_extension)
 
-                    frame_name = 'frame_' + row[0] + '_' + row[2] + '_' + row[4] + '_' + str(second) + file_extension
-                    frame_name = frame_name[:-4]
+                    # File name without extension
+                    frame_name = 'frame_' + row[0] + '_' + row[2] + '_' + row[4] + '_' + str(second)
 
-                    try:
-                        if os.path.isfile(frame_path):
-                            log.info('frame_path:')
-                            log.info(frame_path)
+                    if frame_name in samples_names:
+                        log.info('IN')
 
-                            img = Image.open(frame_path)
+                        # Get image size
+                        with Image.open(tar.extractfile(samples_names[frame_name])) as pil_image:
+                            img_size = pil_image.size
 
-                            bounding_box = [float(row[6]), float(row[7]), float(row[8]), float(row[9])]
-                            object_type = row[3]
+                        # Extract the file in memory
+                        img = tar.extractfile(samples_names[frame_name])
 
-                            annotations = OrderedDict(
-                                [('annotation',
-                                  OrderedDict([('folder', '.'), ('filename', sample_id+image_type),
-                                               ('path', './' + sample_id),
-                                               ('source', OrderedDict([('database', 'Bonseyes_OD')])),
-                                               ('size', OrderedDict([('width', img.size[0]), ('height', img.size[0]),
-                                                                     ('depth', '3')])),
-                                               ('segmented', '0'),
-                                               ('object', OrderedDict([('name', object_type),
-                                                                       ('pose', 'Frontal'),
-                                                                       ('truncated', '0'),
-                                                                       ('difficult', '0'),
-                                                                       ('occluded', '0'),
-                                                                       ('bndbox', OrderedDict([('xmin', bounding_box[0]),
-                                                                                               ('xmax', bounding_box[1]),
-                                                                                               ('ymin', bounding_box[2]),
-                                                                                               ('ymax', bounding_box[3])]))]))]))])
+                        bounding_box = [float(row[6]), float(row[7]), float(row[8]), float(row[9])]
+                        object_type = row[3]  # String
 
-                            sample_id = frame_name
+                        annotations = OrderedDict(
+                            [('annotation',
+                              OrderedDict([('folder', '.'), ('filename', frame_name + image_type),
+                                           ('path', frame_name + image_type),
+                                           ('source', OrderedDict([('database', 'Bonseyes_OD')])),
+                                           ('size', OrderedDict([('width', img_size[0]), ('height', img_size[1]),
+                                                                 ('depth', '3')])),
+                                           ('segmented', '0'),
+                                           ('object', OrderedDict([('name', object_type),
+                                                                   ('pose', 'Frontal'),
+                                                                   ('truncated', '0'),
+                                                                   ('difficult', '0'),
+                                                                   ('occluded', '0'),
+                                                                   (
+                                                                   'bndbox', OrderedDict([('xmin', bounding_box[0]),
+                                                                                          ('xmax', bounding_box[1]),
+                                                                                          ('ymin', bounding_box[2]),
+                                                                                          ('ymax', bounding_box[
+                                                                                              3])]))]))]))])
 
-                            yield str(sample_id), {BONSEYES_PNG_IMAGE_TYPE: img}, {BONSEYES_OD_ANNOTATION_TYPE: annotations}
 
-                    except:
-                        log.info("Missing video")
+                        yield str(frame_name), {BONSEYES_PNG_IMAGE_TYPE: img}, {
+                            BONSEYES_OD_ANNOTATION_TYPE: annotations}
 
                 second += 1
                 previous_video = video_id
