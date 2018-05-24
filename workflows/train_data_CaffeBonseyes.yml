@@ -5,6 +5,9 @@ parameters:
     type: resource
   training_set:
     type: resource
+  label_map:
+    type: resource
+    label: "Labelmap file"
 
 outputs:
   model:
@@ -22,5 +25,7 @@ steps:
     parameters:
       training_set: {type: workflow-parameter, name: training_set }
       model: {type: workflow-parameter, name: model}
-      epochs: "120000" #Optional. By default, 28000
-      batch_size: "12" #Optional. By default, 12
+      label_map: { type: workflow-parameter, name: label_map }
+      background_class: "22" #Optional. By default, 0
+      epochs: "5" #Optional. By default, 120000
+      batch_size: "5" #Optional. By default, 12

@@ -8,23 +8,21 @@ import tempfile
 import zipfile
 import shutil
 
-import subprocess
-import logging as log
-
 from com_bonseyes_base.formats.data.blob.api import BlobDataEditor
-from com_bonseyes_base.formats.data.data_tensors.api import DataTensorsViewer, DimensionNames
+from com_bonseyes_base.formats.data.data_tensors.api import DataTensorsViewer
 from com_bonseyes_base.lib.api.tool import Context
 from com_bonseyes_base.lib.impl.utils import execute_with_logs
 from bonseyes_youtubebb.mobilenetSSD import proto_generator, solver_generator
 
-from google.protobuf import text_format
+import google.protobuf.text_format as text_format
 from caffe.proto import caffe_pb2 as cpb2
 
 
-def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataTensorsViewer, label_map: str, epochs: str, batch_size: str, background_class: str):
+def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataTensorsViewer, label_map: str,
+                           epochs: str, batch_size: str, background_class: str):
 
     with tempfile.TemporaryDirectory() as tmp_dir:
-        
+
         with zipfile.ZipFile(training_set, 'r') as z:
             z.extractall(tmp_dir)
 
@@ -34,7 +32,8 @@ def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataT
             text_format.Merge(str(label_map_file.read()), labels)
             num_labels = len(labels.item)
         train_path = os.path.join(tmp_dir, 'MobileNetSSD_train.prototxt')
-        proto_generator(train_path, 'train', tmp_dir, label_map, int(num_labels), int(batch_size), int(background_class))
+        proto_generator(train_path, 'train', tmp_dir, label_map, int(num_labels),
+                        int(batch_size), int(background_class))
 
         # Generate Solver
         solver_path = os.path.join(tmp_dir, 'solver.prototxt')
@@ -59,6 +58,7 @@ def perform_training_caffe(context: Context[BlobDataEditor], training_set: DataT
                         arcname='trained-model.solverstate')
 
 
-def create(context: Context[BlobDataEditor], training_set: DataTensorsViewer, label_map: str, epochs: str = '28000', batch_size: str = '24', background_class: str = '0'):
+def create(context: Context[BlobDataEditor], training_set: DataTensorsViewer, label_map: str, epochs: str = '120000',
+           batch_size: str = '24', background_class: str = '0'):
 
     perform_training_caffe(context, training_set, label_map, epochs, batch_size, background_class)

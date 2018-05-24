@@ -42,6 +42,7 @@ docker volume ls | grep nvidia
 ```
 
 ### Data needed ###
+Files can be downloaded from git@bitbucket.org:MilagroFernandez/files-objectdetection.git
 ```
 Training images imagesyoutubeBB_T.tar.gz
 Test images		imagesyoutubeBB_B.tar.gz
@@ -90,7 +91,7 @@ pkg/com_bonseyes_base/bin/be-admin run --name packBenchmark --config config.yml 
 To train a model with SSD + MobileNet you can use the following command:
 
 ```
-pkg/com_bonseyes_base/bin/be-admin run workflows/train_data.yml --name training_v4 --force --config config.yml \
+pkg/com_bonseyes_base/bin/be-admin run workflows/train_data.yml --name training --force --config config.yml \
 --param training_set execution-output local: packTraining training_set \
 --param label_map url volume://data/labelmap_youtubebb.prototxt
 ```
@@ -103,7 +104,8 @@ To train a model with CaffeBonseyes you can use the following command:
 
 ```
 pkg/com_bonseyes_base/bin/be-admin run workflows/train_data_CaffeBonseyes.yml --name training_CaffeBonseyes --force --config config.yml \
---param model execution-output local: training_v4 model --param training_set execution-output local: packTraining training_set
+--param model execution-output local: training model --param training_set execution-output local: packTraining training_set \
+--param label_map url volume://data/labelmap_youtubebb.prototxt
 ```
 
 In the `workflows/train_data_CaffeBonseyes.yml` file the user can change the number of `epochs` (parameter epochs). By default, epochs = 28000.
@@ -113,8 +115,9 @@ In the `workflows/train_data_CaffeBonseyes.yml` file the user can change the num
 To benchmark a model with Caffe you can use the following command:
 
 ```
-pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data.yml --name benchmark_v4 --config config.yml --force \
---param model execution-output local: training_v4 model --param training_set execution-output local: packBenchmark training_set
+pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data.yml --name benchmark --config config.yml --force \
+--param model execution-output local: training model --param test_set execution-output local: packBenchmark training_set \
+--param label_map url volume://data/labelmap_youtubebb.prototxt
 ```
 In the `workflows/benchmark_data.yml` file, the user can change the number of `epochs` (parameter epochs). By default, epochs = 20000
 
@@ -134,17 +137,34 @@ In the `workflows/benchmark_data_CaffeBonseyes.yml` file, the user can change th
 To run a full pipeline with Caffe SSD + MobileNet and CaffeBonseyes you can use the following command:
 
 ```
-pkg/com_bonseyes_base/bin/be-admin run --name pipeline_CaffeBonseyes --config config.yml --force workflows/pipeline_CaffeBonseyes.yml \
---param train_images url volume://data/imagesyoutubeBB_T.tar.gz --param train_labels url volume://data/youtube_boundingboxes_detection_train.csv \
---param test_images url volume://data/imagesyoutubeBB_B.tar.gz --param test_labels url volume://data/youtube_boundingboxes_detection_train.csv
-
+pkg/com_bonseyes_base/bin/be-admin run --name pipeline_CaffeBonseyes \
+--config config.yml --force workflows/pipeline_CaffeBonseyes.yml \
+--param train_images url volume://data/imagesyoutubeBB_T.tar.gz \
+--param train_labels url volume://data/youtube_boundingboxes_detection_train.csv \
+--param test_images url volume://data/imagesyoutubeBB_B.tar.gz \
+--param test_labels url volume://data/youtube_boundingboxes_detection_train.csv \
+--param label_map url volume://data/labelmap_youtubebb.prototxt \
+--save output benchmark_report benchmark_report
 ```
 
 In the `workflows/pipeline_CaffeBonseyes.yml` file the user can establish the following parameters:
 - The image dataset and the labels file (csv) for training
 - The image dataset and the labels file (csv) for benchmarking.
+- Labelmap prototxt file that specifies the ID/number of the labels
 - Epochs for training with SSD + MobileNet
 - Epochs for training with CaffeBonseyes
-- Epochs for benchmark with CaffeBonseyes
+- Epochs for benchmarking with SSD + MobileNet
+- Epochs for benchmarking with CaffeBonseyes
 
+### Test pipeline workflow
+```
+pkg/com_bonseyes_base/bin/be-admin run workflows/pipeline_test.yml \
+--name od_pipeline --config config.yml --force \
+--param train_images url volume://data/imagesyoutubeBB_T.tar.gz \
+--param train_labels url volume://data/youtube_boundingboxes_detection_train.csv \
+--param test_images url volume://data/imagesyoutubeBB_B.tar.gz \
+--param test_labels url volume://data/youtube_boundingboxes_detection_train.csv \
+--param label_map url volume://data/labelmap_youtubebb.prototxt \
+--save output benchmark_report benchmark_report
+```
 
