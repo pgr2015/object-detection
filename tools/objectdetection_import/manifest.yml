@@ -20,3 +20,7 @@ actions:
       labels:
         label: "Labels"
         type: resource
+      image_type:
+        label: "Image Type (PNG or JPEG)"
+        type: string
+        optional: true

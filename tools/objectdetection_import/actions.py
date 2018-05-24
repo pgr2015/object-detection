@@ -3,103 +3,99 @@
 #
 # Copyright (c) 2017 UCLM SA. All Rights Reserved.
 #
-import gzip
 import os
-import tempfile
 import tarfile
 import csv
-import time
+from collections import OrderedDict
 
-import requests
 from PIL import Image
-import numpy as np
-from io import BytesIO
 
-import logging as log
-
-from bonseyes_youtubebb import DIGIT_TYPE
+from bonseyes_youtubebb import BONSEYES_OD_ANNOTATION_TYPE
 
 from com_bonseyes_base.formats.data.dataset.api import DataSetEditor
 from com_bonseyes_base.lib.api.tool import Context
-from com_bonseyes_training_base.lib import BONSEYES_PNG_IMAGE_TYPE
+from com_bonseyes_training_base.lib import BONSEYES_PNG_IMAGE_TYPE, BONSEYES_JPEG_IMAGE_TYPE
 from com_bonseyes_training_base.lib.import_helper import write_dataset
-#from bonseyes_youtubebb import YOUTUBEBB_ID_LABEL
 
-def get_data(images: str, labels:str, context: Context[DataSetEditor]):
 
-	samples_names = []
+def get_data(images: str, labels: str, image_type: str):
 
-	with tempfile.TemporaryDirectory() as tmp_dir:
-		with tarfile.open(images, 'r') as tar:
-			for member in tar.getmembers():
+    samples_names = {}
 
-				file = member.name
-				file = os.path.normpath(file)
+    if image_type is BONSEYES_PNG_IMAGE_TYPE:
+        file_extension = '.png'
+    else:
+        file_extension = '.jpeg'
 
-				if (not file.endswith('.png')):
-					continue
+    with tarfile.open(images, 'r') as tar:
+        for member in tar.getmembers():
 
-				sample_id = os.path.basename(file)[:-4]
+            file = member.name
+            file = os.path.normpath(file)
 
-				member.name = os.path.join(*(member.name.split(os.path.sep)[1:]))
+            if not file.endswith(file_extension):
+                continue
 
-				samples_names.append(sample_id)
-				tar.extract(member, tmp_dir)
+            # File name without extension
+            sample_id = os.path.basename(file)[:-4]
 
-		with open(labels, 'r') as csvfile:
+            samples_names[sample_id] = member
 
-			reader = csv.reader(csvfile)
-			previous_video = str('')
-			second = 0
+        with open(labels, 'r') as csv_file:
 
-			for row in reader:
-				video_id = row[0]+'+'+row[2]+'+'+row[4]
-					
-				if  video_id != previous_video:
-					second=0
-					previous_video = str('')
-							
-				if row[5]=='present':
-					frame_path = os.path.join(tmp_dir)
-					frame_path = os.path.join(frame_path, 'frame_'+row[0]+'_'+row[2]+'_'+row[4]+'_'+str(second)+'.png')
-		
-					#log.info(frame_path)
-					frame_name = 'frame_'+row[0]+'_'+row[2]+'_'+row[4]+'_'+str(second)+'.png'
-					frame_name = frame_name [:-4]
+            reader = csv.reader(csv_file)
+            previous_video = str('')
+            second = 0
 
-					try:
-						if os.path.isfile(frame_path):
-							log.info('frame_path:')
-							log.info(frame_path)
-										
-							img = Image.open(frame_path)
-							base=300
-							hpercent = (base / float(img.size[1]))
-							wpercent = (base / float(img.size[0]))
-											
-							bounding_box = [float(row[6]),float(row[7]),float(row[8]),float(row[9])]
-							cx1=int(((bounding_box[0])*img.size[0])*wpercent)
-							cx2=int(((bounding_box[1])*img.size[0])*wpercent)-1
-							cy1=int(((bounding_box[2])*img.size[1])*hpercent)
-							cy2=int(((bounding_box[3])*img.size[1])*hpercent)-1
-							img=img.resize((base,base), Image.ANTIALIAS)
-							previous_video = video_id
-																			
-							out_file = BytesIO()
-							img.save(out_file, format="png")
-							out_file.seek(0)
-							#label = [0, int(row[2]), 0, cx1 ,cy1, cx2, cy2]
-							label = [int(row[2]), cx1 ,cy1, cx2, cy2]      
-							sample_id = frame_name
-			
-							yield str(sample_id), {BONSEYES_PNG_IMAGE_TYPE: out_file}, {DIGIT_TYPE: label}
+            for row in reader:
+                video_id = row[0] + '+' + row[2] + '+' + row[4]
 
-					except:
-						log.info("Missing video")
+                if video_id != previous_video:
+                    second = 0
 
-				second+=1
-				previous_video=video_id
+                if row[5] == 'present':
 
-def create (context: Context[DataSetEditor], images: str, labels:str):
-	data = get_data (images, labels, context)
-	write_dataset(context.data, data)
+                    # File name without extension
+                    frame_name = 'frame_' + row[0] + '_' + row[2] + '_' + row[4] + '_' + str(second)
+
+                    if frame_name in samples_names:
+
+                        # Get image size
+                        with Image.open(tar.extractfile(samples_names[frame_name])) as pil_image:
+                            img_size = pil_image.size
+
+                        # Extract the file in memory
+                        img = tar.extractfile(samples_names[frame_name])
+
+                        bounding_box = [float(row[6]), float(row[7]), float(row[8]), float(row[9])]
+                        object_type = row[3]  # String
+
+                        annotations = OrderedDict(
+                            [('annotation',
+                              OrderedDict([('folder', '.'), ('filename', frame_name + '_data_' + image_type),
+                                           ('path', frame_name + '_data_' + image_type),
+                                           ('source', OrderedDict([('database', 'Bonseyes_OD')])),
+                                           ('size', OrderedDict([('width', img_size[0]), ('height', img_size[1]),
+                                                                 ('depth', '3')])),
+                                           ('object', OrderedDict([('name', object_type),
+                                                                   ('bndbox', OrderedDict(
+                                                                       [('xmin', int(img_size[0] * bounding_box[0])),
+                                                                        ('xmax', int(img_size[0] * bounding_box[1])),
+                                                                        ('ymin', int(img_size[1] * bounding_box[2])),
+                                                                        ('ymax', int(img_size[1] * bounding_box[3]))
+                                                                        ]))]))]))])
+
+                        yield str(frame_name), {BONSEYES_PNG_IMAGE_TYPE: img}, {
+                            BONSEYES_OD_ANNOTATION_TYPE: annotations}
+
+                second += 1
+                previous_video = video_id
+
+
+def create(context: Context[DataSetEditor], images: str, labels: str, image_type: str ='PNG'):
+    if image_type is 'PNG':
+        image_type = BONSEYES_PNG_IMAGE_TYPE
+    else:
+        image_type = BONSEYES_JPEG_IMAGE_TYPE
+    data = get_data(images, labels, image_type)
+    write_dataset(context.data, data)

@@ -18,6 +18,10 @@ parameters:
     label: "Test labels"
     type: resource
 
+  label_map:
+    label: "Labelmap file"
+    type: resource
+
 
 outputs:
 
@@ -69,6 +73,7 @@ steps:
     output: training_set
     parameters:
       raw_dataset: { type: artifact, step: import_dataT }
+      label_map: { type: workflow-parameter, name: label_map }
 
   - description: "Import a dataset"
     worker: import_worker
@@ -84,7 +89,8 @@ steps:
     worker: pack_worker
     output: training_set
     parameters:
-      raw_dataset: { type: artifact, step: import_dataB }     
+      raw_dataset: { type: artifact, step: import_dataB }
+      label_map: { type: workflow-parameter, name: label_map }
  
       
   - description: "Train a model"
@@ -93,6 +99,7 @@ steps:
     output: model
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
+      label_map: { type: workflow-parameter, name: label_map }
       epochs: "12000"
       batch_size: "24" #Optional. By default, 24
       
@@ -102,7 +109,8 @@ steps:
     output: benchmark_report
     parameters:
       model: {type: artifact, step: youtube_model}
-      training_set: {type: artifact, step: pack_datasetB }
+      test_set: {type: artifact, step: pack_datasetB }
+      label_map: { type: workflow-parameter, name: label_map }
       epochs: "5000"
       batch_size: "6" #Optional. By default, 6
 
@@ -113,6 +121,7 @@ steps:
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
       model: {type: artifact, step: youtube_model}
+      label_map: { type: workflow-parameter, name: label_map }
       epochs: "12000"
       batch_size: "12" #Optional. By default, 12
 
@@ -122,6 +131,7 @@ steps:
     output: benchmark_report
     parameters:
       model: {type: artifact, step: youtube_model_CaffeBonseyes}
-      training_set: {type: artifact, step: pack_datasetB }
+      test_set: {type: artifact, step: pack_datasetB }
+      label_map: { type: workflow-parameter, name: label_map }
       epochs: "5000"
       batch_size: "6" #Optional. By default, 6

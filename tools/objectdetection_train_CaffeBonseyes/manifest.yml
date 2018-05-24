@@ -31,3 +31,10 @@ actions:
         label: "Batch size"
         type: string
         optional: true
+      background_class:
+        label: "NumberID of the background class"
+        type: string
+        optional: true
+      label_map:
+        type: resource
+        label: "Labelmap file"

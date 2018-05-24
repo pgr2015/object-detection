@@ -14,19 +14,11 @@ image:
 actions:
   create:
     parameters:
-      #caffemodel:
-      #  label: "Caffe model"
-      #  type: string
-      # tensor:
-      #   label: "Tensor with test data"
-      #   type: resource
-      #   data_format: com.bonseyes.data.data-tensors.0.1
-      
       model:
          label: "Model"
          type: resource
          data_format: com.bonseyes.data.blob.0.1
-      training_set:
+      test_set:
          label: "Training Set"
          type: resource
          #data_format: com.bonseyes.data.data-tensors.0.1
@@ -38,3 +30,10 @@ actions:
         label: "Batch size"
         type: string
         optional: true
+      background_class:
+        label: "NumberID of the background class"
+        type: string
+        optional: true
+      label_map:
+        type: resource
+        label: "Labelmap file"
