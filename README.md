@@ -38,15 +38,16 @@ To create this container you need to do the following:
 The exact name of the `nvidia_driver` volume can be found with the following command:
 
 ```
-docker volumes ls | grep nvidia
+docker volume ls | grep nvidia
 ```
 
 ### Data needed ###
-Training images	imagesyoutubeBB_T.tar.gz
+```
+Training images imagesyoutubeBB_T.tar.gz
 Test images		imagesyoutubeBB_B.tar.gz
-label_map			youtube_boundingboxes_detection_train.csv
+label_map		youtube_boundingboxes_detection_train.csv
 labels			labelmap_youtubebb.prototxt
-
+```
 
 ###How to run the import for training
 

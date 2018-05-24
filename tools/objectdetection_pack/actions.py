@@ -34,13 +34,26 @@ def create(context: Context[DataTensorsEditor], raw_dataset: DataSetViewer, labe
         list_file = os.path.join(tmp_dir, 'lmdb.txt')
         link_dir = os.path.join(tmp_dir, 'link')
 
+        # Check if images are PNG or JPEG
+        image_type = BONSEYES_PNG_IMAGE_TYPE
+        encode_type = 'png'
+        output_format = 'PNG'
+        try:
+            raw_dataset.samples.all[0].data.get(BONSEYES_PNG_IMAGE_TYPE).value.get()
+        except KeyError:
+            image_type = BONSEYES_JPEG_IMAGE_TYPE
+            encode_type = 'jpg'
+            output_format = 'JPEG'
+
         with open(list_file, 'w') as list_f:
             for sample in raw_dataset.samples.all:
-                image = Image.open(BytesIO(sample.data.get(BONSEYES_PNG_IMAGE_TYPE).value.get()))
-                image.save(os.path.join(root_directory, sample.name + '_data_' + BONSEYES_PNG_IMAGE_TYPE), 'JPEG')
+
+                image = Image.open(BytesIO(sample.data.get(image_type).value.get()))
+                image.save(os.path.join(root_directory, sample.name + '_data_' + image_type), output_format)
 
                 annotation = sample.data.get(BONSEYES_OD_ANNOTATION_TYPE).value.get()
 
+                # Ensure XML elements order. Otherwise caffe may fail loading annotations
                 with open(os.path.join(root_directory, sample.name + '.xml'), 'w') as xml_file:
                     annotation_element = ET.Element('annotation')
                     folder_element = ET.SubElement(annotation_element, 'folder')
@@ -69,7 +82,7 @@ def create(context: Context[DataTensorsEditor], raw_dataset: DataSetViewer, labe
                     ymax_element.text = str(annotation['annotation']['object']['bndbox']['ymax'])
 
                     xml_file.write(ET.tostring(annotation_element).decode("utf-8"))
-                    list_f.write(os.path.join(sample.name + '_data_' + BONSEYES_PNG_IMAGE_TYPE) + ' ' +
+                    list_f.write(os.path.join(sample.name + '_data_' + image_type) + ' ' +
                                  os.path.join(sample.name + '.xml' + '\n'))
 
         execute_with_logs('python3', '/opt/caffe/scripts/create_annoset.py',
@@ -80,7 +93,7 @@ def create(context: Context[DataTensorsEditor], raw_dataset: DataSetViewer, labe
                           '--resize-width=300',
                           '--resize-height=300',
                           '--check-label',
-                          '--encode-type=png',
+                          '--encode-type=' + encode_type,
                           '--encoded',
                           root_directory,
                           list_file,
