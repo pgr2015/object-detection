@@ -109,7 +109,7 @@ steps:
     output: benchmark_report
     parameters:
       model: {type: artifact, step: youtube_model}
-      training_set: {type: artifact, step: pack_datasetB }
+      test_set: {type: artifact, step: pack_datasetB }
       label_map: { type: workflow-parameter, name: label_map }
       epochs: "5000"
       batch_size: "6" #Optional. By default, 6
@@ -131,7 +131,7 @@ steps:
     output: benchmark_report
     parameters:
       model: {type: artifact, step: youtube_model_CaffeBonseyes}
-      training_set: {type: artifact, step: pack_datasetB }
+      test_set: {type: artifact, step: pack_datasetB }
       label_map: { type: workflow-parameter, name: label_map }
       epochs: "5000"
       batch_size: "6" #Optional. By default, 6
