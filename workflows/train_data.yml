@@ -3,6 +3,9 @@ description: "Train model with SSD + MobileNet"
 parameters:
   training_set:
     type: resource
+  label_map:
+    type: resource
+    label: "Labelmap file"
 
 outputs:
   model:
@@ -19,5 +22,7 @@ steps:
     output: model
     parameters:
       training_set: {type: workflow-parameter, name: training_set }
-      epochs: "120000" #Optional. By default, 28000
-      batch_size: "24" #Optional. By default, 24
+      label_map: { type: workflow-parameter, name: label_map }
+      background_class: "22" #Optional. By default, 0
+      epochs: "5" #Optional. By default, 28000
+      batch_size: "5" #Optional. By default, 24

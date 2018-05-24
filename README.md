@@ -91,7 +91,8 @@ To train a model with SSD + MobileNet you can use the following command:
 
 ```
 pkg/com_bonseyes_base/bin/be-admin run workflows/train_data.yml --name training_v4 --force --config config.yml \
---param training_set execution-output local: packTraining training_set
+--param training_set execution-output local: packTraining training_set \
+--param label_map url volume://data/labelmap_youtubebb.prototxt
 ```
 
 In the `workflows/train_data.yml` file the user can establish the number of `epochs` (parameter epochs). By default, epochs = 28000
