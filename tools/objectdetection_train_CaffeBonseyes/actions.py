@@ -62,6 +62,6 @@ def perform_training_caffe(context: Context[BlobDataEditor], model: BlobDataEdit
 
 
 def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, label_map: str,
-           epochs: str = '120000', batch_size: str = '24', background_class: str = '0'):
+           epochs: str = '120000', batch_size: str = '12', background_class: str = '0'):
 
     perform_training_caffe(context, model, training_set, label_map, epochs, batch_size, background_class)

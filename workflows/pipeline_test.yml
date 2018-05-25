@@ -88,7 +88,6 @@ steps:
     parameters:
       images: { type: workflow-parameter, name: test_images }
       labels: { type: workflow-parameter, name: test_labels }
-      
 
   - description: "Pack test dataset"
     name: pack_datasetB
@@ -97,7 +96,6 @@ steps:
     parameters:
       raw_dataset: { type: artifact, step: import_dataB }
       label_map: { type: workflow-parameter, name: label_map }
- 
       
   - description: "Train MobileNet-SSD model"
     name: youtube_model
@@ -106,7 +104,8 @@ steps:
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
       label_map: { type: workflow-parameter, name: label_map }
-      epochs: "10" #"12000"
+      background_class: "22" #Optional. By default, 0
+      epochs: "10" #Optional. By default, 120000
       batch_size: "5" #Optional. By default, 24
       
   - description: "Benchmark model"
@@ -117,8 +116,9 @@ steps:
       model: {type: artifact, step: youtube_model}
       test_set: {type: artifact, step: pack_datasetB }
       label_map: { type: workflow-parameter, name: label_map }
-      epochs: "10" #"5000"
-      batch_size: "5" #Optional. By default, 12
+      background_class: "22" #Optional. By default, 0
+      epochs: "10" #Optional. By default, 5000
+      batch_size: "5" #Optional. By default, 6
 
   - description: "Train a model with caffeBonseyes"
     name: youtube_model_CaffeBonseyes
@@ -128,10 +128,11 @@ steps:
       training_set: {type: artifact, step: pack_datasetT }
       label_map: { type: workflow-parameter, name: label_map }
       model: {type: artifact, step: youtube_model}
-      epochs: "10" #"120000"
-      batch_size: "5" #Optional. By default, 24
+      background_class: "22" #Optional. By default, 0
+      epochs: "10" #Optional. By default, 120000
+      batch_size: "5" #Optional. By default, 12
 
-  - description: "Benchmark model"
+  - description: "Benchmark model with caffeBonseyes"
     name: benchmark_CaffeBonseyes
     worker: benchmark_worker_CaffeBonseyes
     output: BC_benchmark_report
@@ -139,5 +140,6 @@ steps:
       model: {type: artifact, step: youtube_model_CaffeBonseyes}
       label_map: { type: workflow-parameter, name: label_map }
       test_set: {type: artifact, step: pack_datasetB }
-      epochs: "10" #"5000"
-      batch_size: "5" #Optional. By default, 12
+      background_class: "22" #Optional. By default, 0
+      epochs: "10" #Optional. By default, 5000
+      batch_size: "5" #Optional. By default, 6
