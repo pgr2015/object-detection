@@ -1,7 +1,5 @@
 import os
-import logging as log
 import json
-import shutil
 from collections import OrderedDict
 import zipfile
 import tempfile
