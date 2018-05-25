@@ -11,6 +11,6 @@ application_config:
       /home/noelia/Descargas/data/files-objectdetection/:
         bind: /volumes/data
         mode: ro
-      nvidia_driver_384.111:
+      nvidia_driver_384.130:
         bind: /usr/local/nvidia
         mode: ro

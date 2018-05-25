@@ -165,6 +165,7 @@ pkg/com_bonseyes_base/bin/be-admin run workflows/pipeline_test.yml \
 --param test_images url volume://data/imagesyoutubeBB_B.tar.gz \
 --param test_labels url volume://data/youtube_boundingboxes_detection_train.csv \
 --param label_map url volume://data/labelmap_youtubebb.prototxt \
---save output benchmark_report benchmark_report
+--save output benchmark_report benchmark_report \
+--save output BC_benchmark_report BC_benchmark_report
 ```
 

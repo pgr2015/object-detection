@@ -37,6 +37,12 @@ outputs:
   benchmark_report:
     label: "Benchmark report"
 
+  BC_model:
+    label: "Model"
+
+  BC_benchmark_report:
+    label: "Benchmark report"
+
 
 
 workers:
@@ -49,10 +55,10 @@ workers:
     manifest: ./tools/objectdetection_train/manifest.yml
   benchmark_worker:
     manifest: ./tools/objectdetection_benchmark/manifest.yml  
-#  train_worker_CaffeBonseyes:
-#    manifest: ./tools/objectdetection_train_CaffeBonseyes/manifest.yml
-#  benchmark_worker_CaffeBonseyes:
-#    manifest: ./tools/objectdetection_benchmark_CaffeBonseyes/manifest.yml
+  train_worker_CaffeBonseyes:
+    manifest: ./tools/objectdetection_train_CaffeBonseyes/manifest.yml
+  benchmark_worker_CaffeBonseyes:
+    manifest: ./tools/objectdetection_benchmark_CaffeBonseyes/manifest.yml
 
 
 
@@ -114,22 +120,24 @@ steps:
       epochs: "10" #"5000"
       batch_size: "5" #Optional. By default, 12
 
-#  - description: "Train a model with caffeBonseyes"
-#    name: youtube_model_CaffeBonseyes
-#    worker: train_worker_CaffeBonseyes
-#    output: model
-#    parameters:
-#      training_set: {type: artifact, step: pack_datasetT }
-#      model: {type: artifact, step: youtube_model}
-#      epochs: "10" #"28000"
-#      batch_size: "5" #Optional. By default, 28000
-#
-#  - description: "Benchmark a model"
-#    name: benchmark_CaffeBonseyes
-#    worker: benchmark_worker_CaffeBonseyes
-#    output: benchmark_report
-#    parameters:
-#      model: {type: artifact, step: youtube_model_CaffeBonseyes}
-#      test_set: {type: artifact, step: pack_datasetB }
-#      epochs: "10" #"5000"
-#      batch_size: "5" #Optional. By default, 28000
+  - description: "Train a model with caffeBonseyes"
+    name: youtube_model_CaffeBonseyes
+    worker: train_worker_CaffeBonseyes
+    output: BC_model
+    parameters:
+      training_set: {type: artifact, step: pack_datasetT }
+      label_map: { type: workflow-parameter, name: label_map }
+      model: {type: artifact, step: youtube_model}
+      epochs: "10" #"120000"
+      batch_size: "5" #Optional. By default, 24
+
+  - description: "Benchmark model"
+    name: benchmark_CaffeBonseyes
+    worker: benchmark_worker_CaffeBonseyes
+    output: BC_benchmark_report
+    parameters:
+      model: {type: artifact, step: youtube_model_CaffeBonseyes}
+      label_map: { type: workflow-parameter, name: label_map }
+      test_set: {type: artifact, step: pack_datasetB }
+      epochs: "10" #"5000"
+      batch_size: "5" #Optional. By default, 12
