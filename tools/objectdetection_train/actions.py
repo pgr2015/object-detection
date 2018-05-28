@@ -12,7 +12,7 @@ from com_bonseyes_base.formats.data.blob.api import BlobDataEditor
 from com_bonseyes_base.formats.data.data_tensors.api import DataTensorsViewer
 from com_bonseyes_base.lib.api.tool import Context
 from com_bonseyes_base.lib.impl.utils import execute_with_logs
-from bonseyes_youtubebb.mobilenetSSD import proto_generator, solver_generator
+from bonseyes_objectdetection.mobilenetSSD import proto_generator, solver_generator
 
 import google.protobuf.text_format as text_format
 from caffe.proto import caffe_pb2 as cpb2

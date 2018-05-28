@@ -8,7 +8,7 @@ from com_bonseyes_base.formats.data.blob.api import BlobDataEditor
 from com_bonseyes_base.formats.data.data_tensors.api import DataTensorsViewer
 from com_bonseyes_base.lib.api.tool import Context
 from com_bonseyes_base.lib.impl.utils import execute_with_logs
-from bonseyes_youtubebb.mobilenetSSD import proto_generator_BonseyesCaffe, solver_generator_test_BonseyesCaffe
+from bonseyes_objectdetection.mobilenetSSD import proto_generator_BonseyesCaffe, solver_generator_test_BonseyesCaffe
 
 import google.protobuf.text_format as text_format
 from caffe.proto import caffe_pb2 as cpb2
@@ -32,10 +32,13 @@ def perform_benchmarking(context: Context[BlobDataEditor], model: BlobDataEditor
             z.extractall(lmdb_test_folder)
 
         # Generate MobileNetSSD_train.prototxt and MobileNetSSD_test.prototxt
+        label_names = []
         with open(label_map, 'r') as label_map_file:
             labels = cpb2.LabelMap()
             text_format.Merge(str(label_map_file.read()), labels)
             num_labels = len(labels.item)
+            for i in range(0, num_labels):
+                label_names[int(label_map.item[i].label)] = label_map.item[i].display_name
         train_path = os.path.join(tmp_dir, 'MobileNetSSD_train.prototxt')
         test_path = os.path.join(tmp_dir, 'MobileNetSSD_test.prototxt')
         proto_generator_BonseyesCaffe(train_path, 'train', lmdb_train_folder, label_map, int(num_labels),
@@ -66,7 +69,7 @@ def perform_benchmarking(context: Context[BlobDataEditor], model: BlobDataEditor
                         class_number = from_class.split(':')[0]
                         AP_class = from_class.split(': ')[1]
                         AP_class = AP_class.split('\n')[0]
-                        AP['AP class ' + class_number] = AP_class
+                        AP['AP class ' + class_number + '-' + label_names[class_number]] = AP_class
                     if 'detection_eval =' in line:
                         mAP = line.split('= ')[1]
                         mAP = mAP.split('\n')[0]

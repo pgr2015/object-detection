@@ -10,7 +10,7 @@ from collections import OrderedDict
 
 from PIL import Image
 
-from bonseyes_youtubebb import BONSEYES_OD_ANNOTATION_TYPE
+from bonseyes_objectdetection import BBOX_TYPE
 
 from com_bonseyes_base.formats.data.dataset.api import DataSetEditor
 from com_bonseyes_base.lib.api.tool import Context
@@ -85,8 +85,7 @@ def get_data(images: str, labels: str, image_type: str):
                                                                         ('ymax', int(img_size[1] * bounding_box[3]))
                                                                         ]))]))]))])
 
-                        yield str(frame_name), {BONSEYES_PNG_IMAGE_TYPE: img}, {
-                            BONSEYES_OD_ANNOTATION_TYPE: annotations}
+                        yield str(frame_name), {BONSEYES_PNG_IMAGE_TYPE: img}, {BBOX_TYPE: annotations}
 
                 second += 1
                 previous_video = video_id

@@ -1,4 +1,5 @@
 be/
 venv/
 .idea/
-
+tools/objectdetection_import_VOC/
+workflows/import_data_VOC.yml
