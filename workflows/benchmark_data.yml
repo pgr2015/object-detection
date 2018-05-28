@@ -27,5 +27,5 @@ steps:
       test_set: {type: workflow-parameter, name: test_set }
       label_map: { type: workflow-parameter, name: label_map }
       background_class: "22" #Optional. By default, 0
-      epochs: "5000" #Optional. By default, 50000
+      epochs: "50000" #Optional. By default, 50000
       batch_size: "6" #Optional. By default, 6

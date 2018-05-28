@@ -11,7 +11,7 @@ from com_bonseyes_base.formats.data.blob.api import BlobDataEditor
 from com_bonseyes_base.formats.data.data_tensors.api import DataTensorsViewer
 from com_bonseyes_base.lib.api.tool import Context
 from com_bonseyes_base.lib.impl.utils import execute_with_logs
-from bonseyes_youtubebb.mobilenetSSD import proto_generator_BonseyesCaffe, solver_generator_BonseyesCaffe
+from bonseyes_objectdetection.mobilenetSSD import proto_generator_BonseyesCaffe, solver_generator_BonseyesCaffe
 
 import google.protobuf.text_format as text_format
 from caffe.proto import caffe_pb2 as cpb2
@@ -62,6 +62,6 @@ def perform_training_caffe(context: Context[BlobDataEditor], model: BlobDataEdit
 
 
 def create(context: Context[BlobDataEditor], model: BlobDataEditor, training_set: DataTensorsViewer, label_map: str,
-           epochs: str = '120000', batch_size: str = '24', background_class: str = '0'):
+           epochs: str = '120000', batch_size: str = '12', background_class: str = '0'):
 
     perform_training_caffe(context, model, training_set, label_map, epochs, batch_size, background_class)

@@ -37,6 +37,12 @@ outputs:
   benchmark_report:
     label: "Benchmark report"
 
+  BC_model:
+    label: "Model"
+
+  BC_benchmark_report:
+    label: "Benchmark report"
+
 
 
 workers:
@@ -56,9 +62,7 @@ workers:
 
 
 
-steps:
-
-  - description: "Import a dataset"
+  - description: "Import training dataset"
     worker: import_worker
     name: import_dataT
     output: raw_dataset
@@ -67,7 +71,7 @@ steps:
       labels: { type: workflow-parameter, name: train_labels }
 
 
-  - description: "Pack dataset"
+  - description: "Pack training dataset"
     name: pack_datasetT
     worker: pack_worker
     output: training_set
@@ -75,35 +79,34 @@ steps:
       raw_dataset: { type: artifact, step: import_dataT }
       label_map: { type: workflow-parameter, name: label_map }
 
-  - description: "Import a dataset"
+  - description: "Import test dataset"
     worker: import_worker
     name: import_dataB
     output: raw_dataset
     parameters:
       images: { type: workflow-parameter, name: test_images }
       labels: { type: workflow-parameter, name: test_labels }
-      
 
-  - description: "Pack dataset"
+  - description: "Pack test dataset"
     name: pack_datasetB
     worker: pack_worker
     output: training_set
     parameters:
       raw_dataset: { type: artifact, step: import_dataB }
       label_map: { type: workflow-parameter, name: label_map }
- 
-      
-  - description: "Train a model"
+
+  - description: "Train MobileNet-SSD model"
     name: youtube_model
     worker: train_worker
     output: model
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
       label_map: { type: workflow-parameter, name: label_map }
-      epochs: "12000"
+      background_class: "22" #Optional. By default, 0
+      epochs: "12000" #Optional. By default, 120000
       batch_size: "24" #Optional. By default, 24
       
-  - description: "Benchmark a model"
+  - description: "Benchmark model"
     name: benchmark
     worker: benchmark_worker
     output: benchmark_report
@@ -111,27 +114,30 @@ steps:
       model: {type: artifact, step: youtube_model}
       test_set: {type: artifact, step: pack_datasetB }
       label_map: { type: workflow-parameter, name: label_map }
-      epochs: "5000"
+      background_class: "22" #Optional. By default, 0
+      epochs: "5000" #Optional. By default, 50000
       batch_size: "6" #Optional. By default, 6
 
   - description: "Train a model with caffeBonseyes"
     name: youtube_model_CaffeBonseyes
     worker: train_worker_CaffeBonseyes
-    output: model
+    output: BC_model
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
-      model: {type: artifact, step: youtube_model}
       label_map: { type: workflow-parameter, name: label_map }
-      epochs: "12000"
+      model: {type: artifact, step: youtube_model}
+      background_class: "22" #Optional. By default, 0
+      epochs: "12000" #Optional. By default, 120000
       batch_size: "12" #Optional. By default, 12
 
-  - description: "Benchmark a model"
+  - description: "Benchmark model with caffeBonseyes"
     name: benchmark_CaffeBonseyes
     worker: benchmark_worker_CaffeBonseyes
-    output: benchmark_report
+    output: BC_benchmark_report
     parameters:
       model: {type: artifact, step: youtube_model_CaffeBonseyes}
-      test_set: {type: artifact, step: pack_datasetB }
       label_map: { type: workflow-parameter, name: label_map }
-      epochs: "5000"
+      test_set: {type: artifact, step: pack_datasetB }
+      background_class: "22" #Optional. By default, 0
+      epochs: "5000" #Optional. By default, 5000
       batch_size: "6" #Optional. By default, 6
