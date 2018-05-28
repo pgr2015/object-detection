@@ -1,12 +1,12 @@
 
 class Generator():
 
-    def __init__(self, train_path):
+    def __init__(self, train_path, background):
       self.first_prior = True
       self.anchors = create_ssd_anchors()
       self.last = "data"
       self.filepath = train_path
-      self.bachground = 22
+      self.bachground = background
       self.quantize = False
 
     def header(self, name):
@@ -385,13 +385,13 @@ layer {
     phase: TEST
   }
   detection_evaluate_param {
-    num_classes: 24
+    num_classes: %d
     background_label_id: %d
     overlap_threshold: 0.5
     evaluate_difficult_gt: false
   }
 }
-""" % (self.class_num, self.class_num, self.bachground, self.bachground))
+""" % (self.class_num, self.class_num, self.bachground, self.class_num, self.bachground))
 
     def ssd_loss(self):
         with open(self.filepath, 'a') as f:
@@ -943,19 +943,20 @@ def create_ssd_anchors(num_layers=6,
             for i in range(num_layers)] + [1.0]
   return list(zip(scales[:-1], scales[1:]))
 
-def proto_generator(train_path,stage,lmdb,labelmap,classes,batch, background=0, gen_ssd=True, size=1.0):
-  gen = Generator(train_path)
-  gen.generate(stage,lmdb,labelmap,classes,batch,gen_ssd, size)
+
+def proto_generator(train_path, stage, lmdb, labelmap, classes, batch, background=0, gen_ssd=True, size=1.0):
+  gen = Generator(train_path, background)
+  gen.generate(stage, lmdb, labelmap, classes, batch, gen_ssd, size)
 
 
-def proto_generator_BonseyesCaffe(train_path,stage,lmdb,labelmap,classes,batch, quantize=False, background=0, gen_ssd=True, size=1.0):
-  gen = Generator(train_path)
-  gen.generate(stage,lmdb,labelmap,classes,batch,gen_ssd, size, quantize)
+def proto_generator_BonseyesCaffe(train_path, stage, lmdb, labelmap, classes, batch, quantize=False, background=0, gen_ssd=True, size=1.0):
+  gen = Generator(train_path, background)
+  gen.generate(stage, lmdb, labelmap, classes, batch, gen_ssd, size, quantize)
 
 
 def solver_generator(filepath,net,max_it,output_path,eval_type):
   with open(filepath, 'w') as f:
-    f.write( """net: "%s"
+    f.write("""net: "%s"
 #test_net: "./examples/MobileNet/proto/MobileNetSSD_test.prototxt"
 #test_iter: 673
 #test_interval: 10000
@@ -983,7 +984,7 @@ ap_version: "11point"
 
 def solver_generator_test(filepath,net_train, net_test,iter,output_path,eval_type):
   with open(filepath, 'w') as f:
-    f.write( """train_net: "%s"
+    f.write("""train_net: "%s"
 test_net: "%s"
 test_iter: %d
 test_interval: 10000
@@ -1011,8 +1012,7 @@ show_per_class_result: true
 
 def solver_generator_BonseyesCaffe(filepath, net, max_it, output_path, eval_type):
         with open(filepath, 'w') as f:
-            f.write(
-"""net: "%s"
+            f.write("""net: "%s"
 # test_net: "./examples/MobileNet/proto/MobileNetSSD_test.prototxt"
 # test_iter: 673
 # test_interval: 10000
@@ -1054,7 +1054,7 @@ show_per_class_result: true
 
 def solver_generator_test_BonseyesCaffe(filepath,net_train, net_test,iter,output_path,eval_type):
   with open(filepath, 'w') as f:
-    f.write( """train_net: "%s"
+    f.write("""train_net: "%s"
 test_net: "%s"
 test_iter: %d
 test_interval: 10000

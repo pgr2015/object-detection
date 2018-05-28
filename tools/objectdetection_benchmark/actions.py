@@ -32,13 +32,13 @@ def perform_benchmarking(context: Context[BlobDataEditor], model: BlobDataEditor
             z.extractall(lmdb_test_folder)
 
         # Generate MobileNetSSD_train.prototxt and MobileNetSSD_test.prototxt
-        label_names = []
+        label_names = {}
         with open(label_map, 'r') as label_map_file:
             labels = cpb2.LabelMap()
             text_format.Merge(str(label_map_file.read()), labels)
             num_labels = len(labels.item)
             for i in range(0, num_labels):
-                label_names[int(label_map.item[i].label)] = label_map.item[i].display_name
+                label_names[str(labels.item[i].label)] = labels.item[i].display_name
         train_path = os.path.join(tmp_dir, 'MobileNetSSD_train.prototxt')
         test_path = os.path.join(tmp_dir, 'MobileNetSSD_test.prototxt')
         proto_generator(train_path, 'train', lmdb_train_folder, label_map, int(num_labels),
