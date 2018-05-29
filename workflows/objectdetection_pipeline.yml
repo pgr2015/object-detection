@@ -25,12 +25,18 @@ parameters:
 
 outputs:
 
-  raw_dataset:
-    label: "dataset"
+  raw_training_dataset:
+    label: "Training dataset"
 
   training_set:
     label: "Training tensor"
-    
+
+  raw_test_dataset:
+    label: "Test dataset"
+
+  test_set:
+    label: "Test tensor"
+
   model:
     label: "Model"
 
@@ -54,7 +60,7 @@ workers:
   train_worker:
     manifest: ./tools/objectdetection_train/manifest.yml
   benchmark_worker:
-    manifest: ./tools/objectdetection_benchmark/manifest.yml  
+    manifest: ./tools/objectdetection_benchmark/manifest.yml
   train_worker_CaffeBonseyes:
     manifest: ./tools/objectdetection_train_CaffeBonseyes/manifest.yml
   benchmark_worker_CaffeBonseyes:
@@ -62,10 +68,12 @@ workers:
 
 
 
+steps:
+
   - description: "Import training dataset"
     worker: import_worker
     name: import_dataT
-    output: raw_dataset
+    output: raw_training_dataset
     parameters:
       images: { type: workflow-parameter, name: train_images }
       labels: { type: workflow-parameter, name: train_labels }
@@ -82,7 +90,7 @@ workers:
   - description: "Import test dataset"
     worker: import_worker
     name: import_dataB
-    output: raw_dataset
+    output: raw_test_dataset
     parameters:
       images: { type: workflow-parameter, name: test_images }
       labels: { type: workflow-parameter, name: test_labels }
@@ -90,7 +98,7 @@ workers:
   - description: "Pack test dataset"
     name: pack_datasetB
     worker: pack_worker
-    output: training_set
+    output: test_set
     parameters:
       raw_dataset: { type: artifact, step: import_dataB }
       label_map: { type: workflow-parameter, name: label_map }
@@ -103,9 +111,9 @@ workers:
       training_set: {type: artifact, step: pack_datasetT }
       label_map: { type: workflow-parameter, name: label_map }
       background_class: "22" #Optional. By default, 0
-      epochs: "12000" #Optional. By default, 120000
+      epochs: "120000" #Optional. By default, 120000
       batch_size: "24" #Optional. By default, 24
-      
+
   - description: "Benchmark model"
     name: benchmark
     worker: benchmark_worker
@@ -115,7 +123,7 @@ workers:
       test_set: {type: artifact, step: pack_datasetB }
       label_map: { type: workflow-parameter, name: label_map }
       background_class: "22" #Optional. By default, 0
-      epochs: "5000" #Optional. By default, 50000
+      epochs: "50000" #Optional. By default, 50000
       batch_size: "6" #Optional. By default, 6
 
   - description: "Train a model with caffeBonseyes"
@@ -127,7 +135,7 @@ workers:
       label_map: { type: workflow-parameter, name: label_map }
       model: {type: artifact, step: youtube_model}
       background_class: "22" #Optional. By default, 0
-      epochs: "12000" #Optional. By default, 120000
+      epochs: "120000" #Optional. By default, 120000
       batch_size: "12" #Optional. By default, 12
 
   - description: "Benchmark model with caffeBonseyes"
@@ -139,5 +147,5 @@ workers:
       label_map: { type: workflow-parameter, name: label_map }
       test_set: {type: artifact, step: pack_datasetB }
       background_class: "22" #Optional. By default, 0
-      epochs: "5000" #Optional. By default, 5000
+      epochs: "50000" #Optional. By default, 50000
       batch_size: "6" #Optional. By default, 6

@@ -103,7 +103,7 @@ pkg/com_bonseyes_base/bin/be-admin run workflows/train_data.yml \
 --param label_map url volume://data/labelmap_youtubebb.prototxt
 ```
 
-In the `workflows/train_data.yml` file the user can establish the number of `epochs` (parameter epochs). By default, epochs = 28000
+In the `workflows/train_data.yml` file the user can establish the number of `epochs`, the `batch_size`, and the `background` class ID.
 
 ###Training CaffeBonseyes
 
@@ -117,7 +117,7 @@ pkg/com_bonseyes_base/bin/be-admin run workflows/train_data_CaffeBonseyes.yml \
 --param label_map url volume://data/labelmap_youtubebb.prototxt
 ```
 
-In the `workflows/train_data_CaffeBonseyes.yml` file the user can change the number of `epochs` (parameter epochs). By default, epochs = 28000.
+In the `workflows/train_data_CaffeBonseyes.yml` file the user can change the number of `epochs`, the `batch_size`, and the `background` class ID.
 
 
 ###Benchmark
@@ -130,7 +130,7 @@ pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data.yml \
 --param test_set execution-output local: pack_benchmark_data training_set \
 --param label_map url volume://data/labelmap_youtubebb.prototxt
 ```
-In the `workflows/benchmark_data.yml` file, the user can change the number of `epochs` (parameter epochs). By default, epochs = 20000
+In the `workflows/benchmark_data.yml` file, the user can change the number of `epochs`, the `batch_size`, and the `background` class ID.
 
 ###Benchmark CaffeBonseyes
 To benchmark a model with CaffeBonseyes you can use the following command:
@@ -139,11 +139,12 @@ To benchmark a model with CaffeBonseyes you can use the following command:
 pkg/com_bonseyes_base/bin/be-admin run workflows/benchmark_data_CaffeBonseyes.yml \ 
 --name benchmark_CaffeBonseyes --force --config config.yml \
 --param model execution-output local: training_CaffeBonseyes model \
---param training_set execution-output local: pack_benchmark_data training_set
+--param test_set execution-output local: pack_benchmark_data training_set \
+--param label_map url volume://data/labelmap_youtubebb.prototxt
 
 ```
 
-In the `workflows/benchmark_data_CaffeBonseyes.yml` file, the user can change the number of ==epochs== (parameter epochs). By default, epochs = 20000
+In the `workflows/benchmark_data_CaffeBonseyes.yml` file, the user can change the number of `epochs`, the `batch_size`, and the `background` class ID.
 
 
 ###Pipeline with CaffeBonseyes
@@ -169,6 +170,7 @@ In the `workflows/objectdetection_pipeline.yml` file the user can establish the 
 - Number of epochs and batch size for training with CaffeBonseyes
 - Number of epochs and batch size for benchmarking with SSD + MobileNet
 - Number of epochs and batch size for benchmarking with CaffeBonseyes
+- Background class ID for training/bechmarking
 
 ### Test pipeline workflow
 It is possible to run a test workflow that runs the complete pipeline with a small number of iterations
@@ -185,3 +187,4 @@ pkg/com_bonseyes_base/bin/be-admin run workflows/pipeline_test.yml \
 --save output BC_benchmark_report BC_benchmark_report.json
 ```
 
+Use the `--save` option in case you want to collect the results.

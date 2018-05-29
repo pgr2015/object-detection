@@ -1,4 +1,4 @@
-description: "Benchmark model"
+description: "Benchmark model using CaffeBonseyes"
 
 parameters:
   model:
@@ -7,20 +7,20 @@ parameters:
     type: resource
   label_map:
     type: resource
-    
+
 outputs:
   benchmark_report:
     label: "Benchmark report"
 
 workers:
 
-  benchmark_worker:
+  benchmark_worker_CaffeBonseyes:
     manifest: ./tools/objectdetection_benchmark/manifest.yml
 
 steps:
-  - description: "Benchmark a model"
-    name: benchmark
-    worker: benchmark_worker
+  - description: "Benchmark the model"
+    name: benchmark_CaffeBonseyes
+    worker: benchmark_worker_CaffeBonseyes
     output: benchmark_report
     parameters:
       model: {type: workflow-parameter, name: model}

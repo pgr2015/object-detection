@@ -25,11 +25,17 @@ parameters:
 
 outputs:
 
-  raw_dataset:
-    label: "dataset"
+  raw_training_dataset:
+    label: "Training dataset"
 
   training_set:
     label: "Training tensor"
+
+  raw_test_dataset:
+    label: "Test dataset"
+
+  test_set:
+    label: "Test tensor"
     
   model:
     label: "Model"
@@ -67,7 +73,7 @@ steps:
   - description: "Import training dataset"
     worker: import_worker
     name: import_dataT
-    output: raw_dataset
+    output: raw_training_dataset
     parameters:
       images: { type: workflow-parameter, name: train_images }
       labels: { type: workflow-parameter, name: train_labels }
@@ -84,7 +90,7 @@ steps:
   - description: "Import test dataset"
     worker: import_worker
     name: import_dataB
-    output: raw_dataset
+    output: raw_test_dataset
     parameters:
       images: { type: workflow-parameter, name: test_images }
       labels: { type: workflow-parameter, name: test_labels }
@@ -92,7 +98,7 @@ steps:
   - description: "Pack test dataset"
     name: pack_datasetB
     worker: pack_worker
-    output: training_set
+    output: test_set
     parameters:
       raw_dataset: { type: artifact, step: import_dataB }
       label_map: { type: workflow-parameter, name: label_map }

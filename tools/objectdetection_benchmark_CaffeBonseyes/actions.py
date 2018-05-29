@@ -31,6 +31,9 @@ def perform_benchmarking(context: Context[BlobDataEditor], model: BlobDataEditor
         with zipfile.ZipFile(test_set, 'r') as z:
             z.extractall(lmdb_test_folder)
 
+        # Runtime quantization
+        quantize = False
+
         # Generate MobileNetSSD_train.prototxt and MobileNetSSD_test.prototxt
         label_names = {}
         with open(label_map, 'r') as label_map_file:
@@ -42,9 +45,9 @@ def perform_benchmarking(context: Context[BlobDataEditor], model: BlobDataEditor
         train_path = os.path.join(tmp_dir, 'MobileNetSSD_train.prototxt')
         test_path = os.path.join(tmp_dir, 'MobileNetSSD_test.prototxt')
         proto_generator_BonseyesCaffe(train_path, 'train', lmdb_train_folder, label_map, int(num_labels),
-                        int(batch_size), int(background_class))
+                        int(batch_size), quantize, int(background_class))
         proto_generator_BonseyesCaffe(test_path, 'test', lmdb_test_folder, label_map, int(num_labels),
-                        int(batch_size), int(background_class))
+                        int(batch_size), quantize, int(background_class))
 
         # Generate Solver
         solver_path = os.path.join(tmp_dir, 'solver.prototxt')
@@ -65,7 +68,7 @@ def perform_benchmarking(context: Context[BlobDataEditor], model: BlobDataEditor
             with open(logfile_path, 'r') as logfile:
                 for line in logfile:
                     if 'class' in line and not '_class_' in line:
-                        from_class = line.split('class')[1]
+                        from_class = line.split('class AP ')[1]
                         class_number = from_class.split(':')[0]
                         AP_class = from_class.split(': ')[1]
                         AP_class = AP_class.split('\n')[0]

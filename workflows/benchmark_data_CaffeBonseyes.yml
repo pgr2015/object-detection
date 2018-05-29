@@ -3,7 +3,9 @@ description: "Benchmark model using CaffeBonseyes"
 parameters:
   model:
     type: resource
-  training_set:
+  test_set:
+    type: resource
+  label_map:
     type: resource
     
 outputs:
@@ -22,6 +24,8 @@ steps:
     output: benchmark_report
     parameters:
       model: {type: workflow-parameter, name: model}
-      training_set: {type: workflow-parameter, name: training_set }
-      epochs: "5000" #Optional. By default, 20000
+      test_set: {type: workflow-parameter, name: test_set }
+      label_map: { type: workflow-parameter, name: label_map }
+      background_class: "22" #Optional. By default, 0
+      epochs: "50000" #Optional. By default, 50000
       batch_size: "6" #Optional. By default, 6

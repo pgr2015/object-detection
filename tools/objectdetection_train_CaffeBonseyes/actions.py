@@ -35,6 +35,8 @@ def perform_training_caffe(context: Context[BlobDataEditor], model: BlobDataEdit
             text_format.Merge(str(label_map_file.read()), labels)
             num_labels = len(labels.item)
         train_path = os.path.join(tmp_dir, 'MobileNetSSD_train.prototxt')
+
+        # Training time quantization
         quantize = False
         proto_generator_BonseyesCaffe(train_path, 'train', tmp_dir, label_map, int(num_labels),
                                       int(batch_size), quantize, int(background_class))
