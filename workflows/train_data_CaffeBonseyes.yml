@@ -19,7 +19,7 @@ workers:
 
 steps:
   - description: "Train a model with CaffeBonseyes"
-    name: youtube_model_CaffeBonseyes
+    name: train_CaffeBonseyes
     worker: train_worker_CaffeBonseyes
     output: model
     parameters:
@@ -27,5 +27,5 @@ steps:
       model: {type: workflow-parameter, name: model}
       label_map: { type: workflow-parameter, name: label_map }
       background_class: "22" #Optional. By default, 0
-      epochs: "5" #Optional. By default, 120000
-      batch_size: "5" #Optional. By default, 12
+      epochs: "12000" #Optional. By default, 120000
+      batch_size: "12" #Optional. By default, 12

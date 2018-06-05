@@ -17,11 +17,11 @@ actions:
       model:
          label: "Model"
          type: resource
-         data_format: com.bonseyes.data.blob.0.1
+         data_format: com.bonseyes.data.model.0.1
       test_set:
          label: "Training Set"
          type: resource
-         #data_format: com.bonseyes.data.data-tensors.0.1
+         data_format: com.bonseyes.data.blob.0.1
       epochs:
         label: "Number of epochs for benchmarking"
         type: string

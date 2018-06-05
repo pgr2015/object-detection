@@ -3,33 +3,41 @@ import json
 from collections import OrderedDict
 import zipfile
 import tempfile
+from shutil import copyfileobj
 
-from com_bonseyes_base.formats.data.blob.api import BlobDataEditor
-from com_bonseyes_base.formats.data.data_tensors.api import DataTensorsViewer
+from com_bonseyes_base.formats.data.blob.api import BlobDataViewer
+from com_bonseyes_base.formats.data.model.api import ModelEditor, \
+    BONSEYES_CAFFE_MODEL_WEIGHTS_BLOB
 from com_bonseyes_base.lib.api.tool import Context
 from com_bonseyes_base.lib.impl.utils import execute_with_logs
 from bonseyes_objectdetection.mobilenetSSD import proto_generator, solver_generator_test
+from com_bonseyes_base.formats.data.blob.api import BlobDataEditor
 
 import google.protobuf.text_format as text_format
 from caffe.proto import caffe_pb2 as cpb2
 
 
-def perform_benchmarking(context: Context[BlobDataEditor], model: BlobDataEditor, test_set: DataTensorsViewer,
-                           label_map: str, epochs: str, batch_size: str, background_class: str):
+def perform_benchmarking(context: Context[BlobDataEditor], model: ModelEditor, test_set: BlobDataViewer,
+                         label_map: str, epochs: str, batch_size: str, background_class: str):
 
     with tempfile.TemporaryDirectory() as tmp_dir:
 
-        model_path = os.path.join(tmp_dir, 'model')
-        with model.view_content() as model_zip:
-            with zipfile.ZipFile(model_zip, 'r') as z:
-                z.extractall(model_path)
+        model_folder_path = os.path.join(tmp_dir, 'model')
+        os.mkdir(model_folder_path)
+
+        weights_path = os.path.join(model_folder_path, 'trained-model.caffemodel')
+
+        with model.open_blob(BONSEYES_CAFFE_MODEL_WEIGHTS_BLOB, 'rb') as fpi:
+            with open(weights_path, 'wb') as fpo:
+                copyfileobj(fpi, fpo)
 
         lmdb_train_folder = os.path.join(tmp_dir, 'dataset_train')
         lmdb_test_folder = os.path.join(tmp_dir, 'dataset_test')
-        with zipfile.ZipFile(test_set, 'r') as z:
-            z.extractall(lmdb_train_folder)
-        with zipfile.ZipFile(test_set, 'r') as z:
-            z.extractall(lmdb_test_folder)
+        # Get test dataset
+        with test_set.view_content() as lmdb_zip:
+            with zipfile.ZipFile(lmdb_zip, 'r') as z:
+                z.extractall(lmdb_train_folder)
+                z.extractall(lmdb_test_folder)
 
         # Generate MobileNetSSD_train.prototxt and MobileNetSSD_test.prototxt
         label_names = {}
@@ -51,7 +59,6 @@ def perform_benchmarking(context: Context[BlobDataEditor], model: BlobDataEditor
         solver_generator_test(solver_path, train_path, test_path, int(epochs), tmp_dir + '/', 'detection')
 
         # Training
-        weights_path = os.path.join(model_path, 'trained-model.caffemodel')
         execute_with_logs('/opt/caffe/build/tools/caffe', 'train', '--solver=' + solver_path,
                           '--weights=' + weights_path, '--gpu', '0')
 
@@ -79,7 +86,7 @@ def perform_benchmarking(context: Context[BlobDataEditor], model: BlobDataEditor
                 json.dump(AP, fp)
 
 
-def create(context: Context[BlobDataEditor], model: BlobDataEditor, test_set: DataTensorsViewer, label_map: str,
+def create(context: Context[BlobDataEditor], model: ModelEditor, test_set: BlobDataViewer, label_map: str,
            epochs: str = '5000', batch_size: str = '6', background_class: str = '0'):
 
     perform_benchmarking(context, model, test_set, label_map, epochs, batch_size, background_class)

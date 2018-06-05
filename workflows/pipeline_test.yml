@@ -104,7 +104,7 @@ steps:
       label_map: { type: workflow-parameter, name: label_map }
       
   - description: "Train MobileNet-SSD model"
-    name: youtube_model
+    name: train
     worker: train_worker
     output: model
     parameters:
@@ -119,7 +119,7 @@ steps:
     worker: benchmark_worker
     output: benchmark_report
     parameters:
-      model: {type: artifact, step: youtube_model}
+      model: {type: artifact, step: train}
       test_set: {type: artifact, step: pack_datasetB }
       label_map: { type: workflow-parameter, name: label_map }
       background_class: "22" #Optional. By default, 0
@@ -127,13 +127,13 @@ steps:
       batch_size: "5" #Optional. By default, 6
 
   - description: "Train a model with caffeBonseyes"
-    name: youtube_model_CaffeBonseyes
+    name: train_CaffeBonseyes
     worker: train_worker_CaffeBonseyes
     output: BC_model
     parameters:
       training_set: {type: artifact, step: pack_datasetT }
       label_map: { type: workflow-parameter, name: label_map }
-      model: {type: artifact, step: youtube_model}
+      model: {type: artifact, step: train}
       background_class: "22" #Optional. By default, 0
       epochs: "10" #Optional. By default, 120000
       batch_size: "5" #Optional. By default, 12
@@ -143,7 +143,7 @@ steps:
     worker: benchmark_worker_CaffeBonseyes
     output: BC_benchmark_report
     parameters:
-      model: {type: artifact, step: youtube_model_CaffeBonseyes}
+      model: {type: artifact, step: train_CaffeBonseyes}
       label_map: { type: workflow-parameter, name: label_map }
       test_set: {type: artifact, step: pack_datasetB }
       background_class: "22" #Optional. By default, 0

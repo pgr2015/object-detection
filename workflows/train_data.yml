@@ -17,7 +17,7 @@ workers:
 
 steps:
   - description: "Train a model"
-    name: youtube_model
+    name: train
     worker: train_worker
     output: model
     parameters:

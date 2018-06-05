@@ -14,13 +14,13 @@ outputs:
 
 workers:
 
-  benchmark_worker_CaffeBonseyes:
+  benchmark_worker:
     manifest: ./tools/objectdetection_benchmark/manifest.yml
 
 steps:
   - description: "Benchmark the model"
-    name: benchmark_CaffeBonseyes
-    worker: benchmark_worker_CaffeBonseyes
+    name: benchmark
+    worker: benchmark_worker
     output: benchmark_report
     parameters:
       model: {type: workflow-parameter, name: model}

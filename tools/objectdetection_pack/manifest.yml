@@ -1,7 +1,7 @@
-description: "Exports the YoutubeBB data to a tensor for training"
+description: "Exports the data to an lmdb for training"
 
 output:
-  data_format: com.bonseyes.data.data-tensors.0.1
+  data_format: com.bonseyes.data.blob.0.1
 
 image:
   image_type: dockerfile

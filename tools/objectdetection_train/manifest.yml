@@ -9,7 +9,7 @@ image:
     - ./tools/objectdetection_train/Dockerfile
 
 output:
-  data_format: com.bonseyes.data.blob.0.1
+  data_format: com.bonseyes.data.model.0.1
 
 actions:
   create:
@@ -17,7 +17,7 @@ actions:
       training_set:
         label: "Training Set"
         type: resource
-        #data_format: com.bonseyes.data.data-tensors.0.1
+        data_format: com.bonseyes.data.blob.0.1
       epochs:
         label: "Number of epochs"
         type: string

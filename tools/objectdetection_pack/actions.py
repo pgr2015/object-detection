@@ -7,7 +7,7 @@ import zipfile
 
 from bonseyes_objectdetection import BBOX_TYPE, WIDTH, HEIGHT
 
-from com_bonseyes_base.formats.data.data_tensors.api import DataTensorsEditor
+from com_bonseyes_base.formats.data.blob.api import BlobDataEditor
 from com_bonseyes_base.formats.data.dataset.api import DataSetViewer
 from com_bonseyes_base.lib.api.tool import Context
 
@@ -22,7 +22,7 @@ from com_bonseyes_training_base.lib import BONSEYES_PNG_IMAGE_TYPE, BONSEYES_JPE
 from com_bonseyes_base.lib.impl.utils import execute_with_logs
 
 
-def create(context: Context[DataTensorsEditor], raw_dataset: DataSetViewer, label_map: str):
+def create(context: Context[BlobDataEditor], raw_dataset: DataSetViewer, label_map: str):
 
     with tempfile.TemporaryDirectory() as tmp_dir:
 
