@@ -23,6 +23,6 @@ steps:
     parameters:
       training_set: {type: workflow-parameter, name: training_set }
       label_map: { type: workflow-parameter, name: label_map }
-      background_class: "22" #Optional. By default, 0
-      epochs: "120000" #Optional. By default, 120000
-      batch_size: "24" #Optional. By default, 24
+      background_class: "0" #Optional. By default, 0
+      epochs: "500000" #Optional. By default, 120000
+      batch_size: "4" #Optional. By default, 24

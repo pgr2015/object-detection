@@ -6,6 +6,7 @@
 import os
 import tempfile
 import zipfile
+import numpy as np
 from shutil import copyfileobj, copy2
 
 from com_bonseyes_base.formats.data.blob.api import BlobDataViewer
@@ -19,6 +20,7 @@ from bonseyes_objectdetection.mobilenetSSD import proto_generator, solver_genera
 
 import google.protobuf.text_format as text_format
 from caffe.proto import caffe_pb2 as cpb2
+import caffe
 
 
 def perform_training_caffe(context: Context[ModelEditor], training_set: BlobDataViewer, label_map: str,
@@ -56,6 +58,12 @@ def perform_training_caffe(context: Context[ModelEditor], training_set: BlobData
         proto_generator(deploy_path, 'deploy', tmp_dir, label_map, int(num_labels),
                         int(batch_size), int(background_class))
 
+
+        net = caffe.Net(train_path, weights_path, caffe.TRAIN)  
+        net_deploy = caffe.Net(deploy_path, caffe.TEST)
+        merge_bn(net, net_deploy)
+        net_deploy.save(weights_path)
+
         # save the model
         context.data.set_model_type(BONSEYES_CAFFE_MODEL_TYPE)
 
@@ -70,12 +78,12 @@ def perform_training_caffe(context: Context[ModelEditor], training_set: BlobData
         with context.data.open_blob(BONSEYES_CAFFE_MODEL_SOLVER_CONFIG_BLOB, 'wb') as fpo:
             with open(solver_path, 'rb') as fpi:
                 copyfileobj(fpi, fpo)
-
+        
         with context.data.open_blob(BONSEYES_CAFFE_MODEL_WEIGHTS_BLOB, 'wb') as fpo:
-            weights_path = os.path.join(tmp_dir, 'snapshot_iter_' + epochs + '.caffemodel')
+            #weights_path = os.path.join(tmp_dir, 'snapshot_iter_' + epochs + '.caffemodel')
             with open(weights_path, 'rb') as fpi:
                 copyfileobj(fpi, fpo)
-
+        
         with context.data.open_blob(BONSEYES_CAFFE_MODEL_SOLVER_STATE_BLOB, 'wb') as fpo:
             state_path = os.path.join(tmp_dir, 'snapshot_iter_' + epochs + '.solverstate')
             with open(state_path, 'rb') as fpi:
@@ -86,3 +94,39 @@ def create(context: Context[ModelEditor], training_set: BlobDataViewer, label_ma
            epochs: str = '120000', batch_size: str = '24', background_class: str = '0'):
 
     perform_training_caffe(context, training_set, label_map, epochs, batch_size, background_class)
+
+def merge_bn(net, nob):
+    print (type(net.params))
+    for key in net.params.keys():
+        if type(net.params[key]) is caffe._caffe.BlobVec:
+            if key.endswith("/bn") or key.endswith("/scale"):
+                continue
+            else:
+                conv = net.params[key]
+                if not key+"/bn" in net.params: #net.params.has_key(key + "/bn"):
+                    for i, w in enumerate(conv):
+                        nob.params[key][i].data[...] = w.data
+                else:
+                    bn = net.params[key + "/bn"]
+                    scale = net.params[key + "/scale"]
+                    wt = conv[0].data
+                    channels = wt.shape[0]
+                    bias = np.zeros(wt.shape[0])
+                    if len(conv) > 1:
+                        bias = conv[1].data
+                    mean = bn[0].data
+                    var = bn[1].data
+                    scalef = bn[2].data
+                    scales = scale[0].data
+                    shift = scale[1].data
+                    if scalef != 0:
+                        scalef = 1. / scalef
+                    mean = mean * scalef
+                    var = var * scalef
+                    rstd = 1. / np.sqrt(var + 1e-5)
+                    rstd1 = rstd.reshape((channels,1,1,1))
+                    scales1 = scales.reshape((channels,1,1,1))
+                    wt = wt * rstd1 * scales1
+                    bias = (bias - mean) * rstd * scales + shift
+                    nob.params[key][0].data[...] = wt
+                    nob.params[key][1].data[...] = bias

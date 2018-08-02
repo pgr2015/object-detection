@@ -4,11 +4,11 @@ application_config:
 #    memswap_limit: "2G"
     devices:
       - /dev/nvidiactl
-      - /dev/nvidia-uvm-tools
+      #- /dev/nvidia-uvm-tools
       - /dev/nvidia-uvm
       - /dev/nvidia0
     volumes:
-      /home/noelia/Descargas/data/files-objectdetection/:
+      /home/z638420/files-pd:
         bind: /volumes/data
         mode: ro
       nvidia_driver_384.130:

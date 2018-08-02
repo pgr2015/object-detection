@@ -58,7 +58,7 @@ WORKDIR $CAFFE_ROOT
 RUN git clone https://github.com/weiliu89/caffe.git . && git checkout ssd && \
     cd python && for req in $(cat requirements.txt) pydot 'python-dateutil>2' 'protobuf>3'; do pip3 install $req; done && cd .. && \
     mkdir build && cd build && \
-    cmake -DUSE_CUDNN=1 -Dpython_version=3 .. && \
+    cmake -DCUDA_ARCH_NAME="Manual" -DCUDA_ARCH_BIN="30 35 50 52 60 61 70" -DUSE_CUDNN=1 -Dpython_version=3 .. && \
     make -j"$(nproc)"
 
 ENV PYCAFFE_ROOT $CAFFE_ROOT/python
