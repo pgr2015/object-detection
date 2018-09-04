@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2017 UCLM SA. All Rights Reserved.
 #
-import os,time
+import os
 import tempfile
 import zipfile
 import numpy as np
@@ -98,7 +98,6 @@ def perform_training_caffe(context: Context[ModelEditor], training_set: BlobData
         net_deploy = caffe.Net(deploy_path, caffe.TEST)
         merge_bn(net, net_deploy)
         net_deploy.save(os.path.join(tmp_dir,'tmp.caffemodel'))
-        #time.sleep(300)
 
         # save the model
         context.data.set_model_type(BONSEYES_CAFFE_MODEL_TYPE)
