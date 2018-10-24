@@ -233,7 +233,7 @@ layers {
     phase: TEST
   } 
 }
-""" % (bottom, top, name, topk)         )
+""" % (name, bottom, top, topk)         )
 
 
     def softmax_with_loss(self,bottom,top,name):
@@ -247,7 +247,7 @@ layers {
   type: "SoftmaxWithLoss"
   bottom:"label"
 }
-""" % (bottom, top, name))
+""" % (name, bottom, top))
 
     def softmax(self, bottom, top, name):
         with open(self.filepath, 'a') as f:

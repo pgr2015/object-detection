@@ -101,8 +101,8 @@ layer {
   }
 """
             weight_filler = """
-  weight_filler {
-    type: "xavier"
+    weight_filler {
+      type: "xavier"
   }            
 """
         with open(self.filepath, 'a') as f:
@@ -158,27 +158,27 @@ layer {
         weight_filler = ""
         if self.stage == "train" or self.stage == "test":
             bias_filler ="""
-bias_filler {
-  type: "constant"
-  value: 0.1
-}
+  bias_filler {
+    type: "constant"
+    value: 0.0
+  }
         """
             bias_lr_mult = """
-param {
-  lr_mult: 1.0
-  decay_mult: 1.0
-}
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
         """
             weight_lr_mult = """
-param {
-  lr_mult: 2.0
-  decay_mult: 0.0
-}
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
         """
             weight_filler = """
-weight_filler {
-  type: "gaussian"
-  sdt: 0.005  }  
+  weight_filler {
+    type: "xavier"
+      }  
         """
         with open(self.filepath, 'a') as f:
             f.write(
@@ -188,15 +188,13 @@ layers {
   top: "%s"
   name: "%s"
   type: "InnerProduct"
-  %s
-  %s
   inner_product_param {
     num_output: %d
     %s
     %s
     }
 }
-"""%(bottom, top,name, bias_lr_mult, weight_lr_mult, out, weight_filler, bias_filler)
+"""%(bottom, top,name, out, weight_filler, bias_filler)
             )
 
     def dropout(self, bottom, top, name, ratio):
@@ -233,7 +231,7 @@ layers {
     phase: TEST
   } 
 }
-""" % (bottom, top, name, topk)         )
+""" % (name, bottom, top, topk))
 
 
     def softmax_with_loss(self,bottom,top,name):
@@ -246,8 +244,11 @@ layers {
   top: "%s"
   type: "SoftmaxWithLoss"
   bottom:"label"
+  	include {
+	  phase: TRAIN
+	}
 }
-""" % (bottom, top, name))
+""" % (name, bottom, top))
 
     def softmax(self, bottom, top, name):
         with open(self.filepath, 'a') as f:
@@ -258,6 +259,7 @@ layers {
   top: "%s"
   name: "%s"
   type: "SOFTMAX"
+  
 }
 """%(bottom, top, name)
             )
@@ -386,7 +388,7 @@ layers {
 
         self.conv(bottom="res2b_branch2b", top="res2b_branch2c", name="res2b_branch2c", out=256, kernel=1, pad=0, stride=1)
         self.bn(bottom="res2b_branch2c", top="res2b_branch2c", name="bn2b_branch2c")
-        self.scale(bottom="res2b_branch2c", top="res2b_branch2c", name="scale2b_branch2b")
+        self.scale(bottom="res2b_branch2c", top="res2b_branch2c", name="scale2b_branch2c")
         self.eltwise(bottom1="res2a", bottom2="res2b_branch2c", top="res2b", name="res2b")
         self.relu(bottom="res2b", top="res2b", name="res2b_relu")
 
@@ -402,7 +404,7 @@ layers {
 
         self.conv(bottom="res2c_branch2b", top="res2c_branch2c", name="res2c_branch2c", out=256, kernel=1, pad=0, stride=1)
         self.bn(bottom="res2c_branch2c", top="res2c_branch2c", name="bn2c_branch2c")
-        self.scale(bottom="res2c_branch2c", top="res2c_branch2c", name="scale2c_branch2b")
+        self.scale(bottom="res2c_branch2c", top="res2c_branch2c", name="scale2c_branch2c")
         self.eltwise(bottom1="res2b", bottom2="res2c_branch2c", top="res2c", name="res2c")
         self.relu(bottom="res2c", top="res2c", name="res2c_relu")
 
@@ -423,7 +425,7 @@ layers {
         self.conv(bottom="res3a_branch2b", top="res3a_branch2c", name="res3a_branch2c", out=512, kernel=1, pad=0,
                   stride=1)
         self.bn(bottom="res3a_branch2c", top="res3a_branch2c", name="bn3a_branch2c")
-        self.scale(bottom="res3a_branch2c", top="res3a_branch2c", name="scale3a_branch2b")
+        self.scale(bottom="res3a_branch2c", top="res3a_branch2c", name="scale3a_branch2c")
         self.eltwise(bottom1="res3a_branch1", bottom2="res3a_branch2c", top="res3a", name="res3a")
         self.relu(bottom="res3a", top="res3a", name="res3a_relu")
 
@@ -494,7 +496,7 @@ layers {
 
         self.conv(bottom="res4a_branch2b", top="res4a_branch2c", name="res4a_branch2c", out=1024, kernel=1, pad=0, stride=1)
         self.bn(bottom="res4a_branch2c", top="res4a_branch2c", name="bn4a_branch2c")
-        self.scale(bottom="res4a_branch2c", top="res4a_branch2c", name="scale4a_branch2b")
+        self.scale(bottom="res4a_branch2c", top="res4a_branch2c", name="scale4a_branch2c")
         self.eltwise(bottom1="res4a_branch1", bottom2="res4a_branch2c", top="res4a", name="res4a")
         self.relu(bottom="res4a", top="res4a", name="res4a_relu")
 
@@ -633,7 +635,7 @@ layers {
         self.relu(bottom="res5c_branch2b", top="res5c_branch2b", name="res5c_branch2b_relu")
 
         self.conv(bottom="res5c_branch2b", top="res5c_branch2c", name="res5c_branch2c", out=2048, kernel=1, pad=0, stride=1)
-        self.bn(bottom="res5b_branch2c", top="res5b_branch2c", name="bn5b_branch2c")
+        self.bn(bottom="res5c_branch2c", top="res5c_branch2c", name="bn5c_branch2c")
         self.scale(bottom="res5c_branch2c", top="res5c_branch2c", name="scale5c_branch2c")
         self.eltwise(bottom1="res5b", bottom2="res5c_branch2c", top="res5c", name="res5c")
         self.relu(bottom="res5c", top="res5c", name="res5c_relu")
