@@ -713,6 +713,3 @@ eval_type: "%s"
 ap_version: "11point"
 show_per_class_result: true
 """ % (net_train, net_test, iter, output_path, eval_type))
-
-if __name__=="__main__":
-    proto_generator("resnet.prototxt","train","123.lmdb",classes=2, batch=32)
