@@ -117,6 +117,7 @@ layer {
     pad: %d
     kernel_size: %d
     stride: %d
+    bias_term: false
     %s
     %s
   }
@@ -335,7 +336,7 @@ layers {
         self.quantize = quantize
         self.input_size = 200
         self.size = size
-        self.header("VGG-16")
+        self.header("Resnet-50")
         if self.quantize:
             self.quantizeNet()
         if stage == "train":
@@ -347,11 +348,11 @@ layers {
         else:
             self.data_deploy()
 
-        self.conv(bottom="data", name="conv1", top="conv1", out=64, pad=3, kernel=7)
+        self.conv(bottom="data", name="conv1", top="conv1", out=64, pad=3, kernel=7,stride=2)
         self.bn(bottom="conv1", top="conv1", name="bn_conv1")
         self.scale(bottom="conv1", top="conv1", name="scale_conv1")
         self.relu(bottom="conv1",top="conv1", name="conv1_relu")
-        self.max_pooling(bottom="conv1", top="pool1", name="pool1", kernel=2, stride=3)
+        self.max_pooling(bottom="conv1", top="pool1", name="pool1", kernel=3, stride=2)
 
         self.conv(bottom="pool1", top="res2a_branch1", name="res2a_branch1", out=256, kernel=1, pad=0, stride=1)
         self.bn(bottom="res2a_branch1", top="res2a_branch1", name="bn2a_branch1")
@@ -651,13 +652,12 @@ layers {
         # else:
         #     self.softmax(bottom="fc8", top="prob", name="prob")
 
+def proto_generator(train_path, stage, lmdb,  classes, batch, gen_ssd=True, size=1.0):
+    gen = Generator(train_path)
+    gen.generate(stage, lmdb,  classes, batch, size)
 
-    def proto_generator(train_path, stage, lmdb, labelmap, classes, batch, background=0, gen_ssd=True, size=1.0):
-      gen = Generator(train_path)
-      gen.generate(stage, lmdb,  classes, batch, size)
-
-    def solver_generator(filepath,net,max_it,output_path,eval_type):
-      with open(filepath, 'w') as f:
+def solver_generator(filepath,net,max_it,output_path,eval_type):
+    with open(filepath, 'w') as f:
         f.write("""net: "%s"
 #test_net: "./examples/MobileNet/proto/MobileNetSSD_test.prototxt"
 #test_iter: 673
@@ -712,3 +712,5 @@ ap_version: "11point"
 show_per_class_result: true
 """ % (net_train, net_test, iter, output_path, eval_type))
 
+if __name__=="__main__":
+    proto_generator("resnet.prototxt","train","123.lmdb",classes=2, batch=32)
