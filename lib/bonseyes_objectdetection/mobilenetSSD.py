@@ -499,7 +499,7 @@ layer {
 """
       biasstr = ""
       if bias == False:
-          biasstr = "\n    bias_term: true"
+          biasstr = "\n    bias_term: false"
       with open(self.filepath, 'a') as f:
           f.write(
 """layer {
@@ -617,7 +617,7 @@ layer {
 """
       biasstr = ""
       if bias == False:
-          biasstr = "\n    bias_term: true"
+          biasstr = "\n    bias_term: false"
       with open(self.filepath, 'a') as f:
           f.write(
 """layer {

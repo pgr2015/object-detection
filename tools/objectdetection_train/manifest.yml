@@ -7,6 +7,10 @@ image:
     - ./tools/objectdetection_train/Dockerfile-base
     - ./pkg/com_bonseyes_base/images/base/Dockerfile
     - ./tools/objectdetection_train/Dockerfile
+  requirements:
+    gpu:
+      requirement_type: gpu
+      label: NVIDIA GPU
 
 output:
   data_format: com.bonseyes.data.model.0.1

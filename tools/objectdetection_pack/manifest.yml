@@ -10,6 +10,10 @@ image:
     - ./tools/objectdetection_pack/Dockerfile-base
     - ./pkg/com_bonseyes_base/images/base/Dockerfile
     - ./tools/objectdetection_pack/Dockerfile
+  requirements:
+    gpu:
+      requirement_type: gpu
+      label: NVIDIA GPU
 
 actions:
   create:
